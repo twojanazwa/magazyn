@@ -1,0 +1,18 @@
+{
+    "site_name": "iMAG",
+    "site_description": "Inteligentny magazyn",
+    "app_icon": "favicon.ico",
+    "app_logo": "logo.png",
+    "footer_content": "&copy; 2025 iMAG. Wszelkie prawa zastrzeżone.",
+    "items_per_list": {
+        "produkty": 20,
+        "zamowienia": 20,
+        "zwroty": 10
+    },
+    "api_key": "11Qwert11@",
+    "kurierzy": [
+        {"id": "DPD", "name": "DPD", "tracking_url": "https://gls-group.eu/PL/pl/sledzenie-paczek?matchcode=%s"},
+        {"id": "InPost", "name": "InPost", "tracking_url": "https://projekt.inpost.pl/sledzenie-przesylek?number=%s"},
+        {"id": "Poczta Polska", "name": "Poczta Polska", "tracking_url": "https://emonitoring.poczta-polska.pl/?numer=%s"}
+    ]
+}

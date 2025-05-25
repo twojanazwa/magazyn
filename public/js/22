@@ -1,0 +1,1523 @@
+﻿// tn_scripts.js
+
+// Utworzenie globalnej przestrzeni nazw dla aplikacji, jeśli jeszcze nie istnieje.
+// Zapobiega to konfliktom nazw zmiennych i funkcji w globalnym zasięgu.
+var tnApp = tnApp || {};
+
+// Natychmiastowo wywoływana funkcja (IIFE - Immediately Invoked Function Expression)
+// Tworzy prywatny zasięg dla kodu, chroniąc zmienne i funkcje przed dostępem z zewnątrz,
+// z wyjątkiem tych jawnie przypisanych do obiektu 'app' (czyli tnApp).
+(function(app) {
+    'use strict'; // Włącza tryb ścisły JavaScript, który pomaga wyłapać błędy.
+
+    // --- Konfiguracja Aplikacji ---
+    // Obiekt konfiguracyjny, który może przechowywać globalne ustawienia.
+    // Wartości mogą być wczytywane z PHP (np. przez atrybuty data w tagu <body> lub <script>).
+    app.config = {
+        // firstEmptyLocation: null, // Przechowuje ID pierwszej wolnej lokalizacji w magazynie. Powinno być ustawione przez PHP.
+        debug: false // Flaga włączająca/wyłączająca logowanie debugujące do konsoli. Ustaw na 'true' podczas developmentu, 'false' na produkcji.
+    };
+
+    // --- Funkcja Logowania Debugującego ---
+    // Prosta funkcja do logowania komunikatów tylko wtedy, gdy tryb debugowania jest włączony.
+    const log = (message, ...data) => {
+        if (app.config.debug) {
+            // Upewnij się, że console.log dostaje co najmniej dwa argumenty, nawet jeśli 'data' jest puste,
+            // dla spójności wyświetlania w niektórych konsolach.
+            const args = data.length > 0 ? data : [];
+            console.log("TN_LOG:", message, ...args);
+        }
+    };
+
+    // --- Główna Funkcja Inicjalizująca ---
+    // Wywoływana po pełnym załadowaniu DOM (DOMContentLoaded).
+    // Odpowiada za uruchomienie wszystkich niezbędnych komponentów i listenerów.
+    app.init = function() {
+        log('Inicjalizacja TN App JS...');
+        this.initFlashMessages(); // Inicjalizacja automatycznego zamykania komunikatów flash.
+        this.initTooltips(); // Inicjalizacja podpowiedzi Bootstrapa.
+        this.initThemeSwitcher(); // Inicjalizacja logiki przełączania motywu.
+        this.initProductModal(); // Inicjalizacja modala produktu (dodawanie/edycja).
+        this.initOrderModal(); // Inicjalizacja modala zamówienia (dodawanie/edycja).
+        this.initAssignWarehouseModal(); // Inicjalizacja modala przypisywania do magazynu.
+        this.initImageZoomModal(); // Inicjalizacja modala powiększenia obrazka.
+        this.initWarehouseFilters(); // Inicjalizacja logiki filtrowania widoku magazynu.
+        this.initCourierModal(); // Inicjalizacja modala kurierów (dodawanie/edycja).
+        this.initRegalModal();   // Inicjalizacja modala regałów (dodawanie/edycja).
+        // Tutaj można dodać wywołania innych funkcji inicjalizujących nowe moduły.
+        log('Inicjalizacja TN App JS zakończona.');
+    };
+
+    // --- Funkcje Pomocnicze / Moduły Aplikacji ---
+
+    /**
+     * Inicjalizuje automatyczne zamykanie komunikatów flash Bootstrapa.
+     * Działa na elementach z klasami '.tn-flash-container .alert.alert-dismissible'.
+     * Komunikaty znikają po 7 sekundach.
+     */
+    app.initFlashMessages = function() {
+        const flashContainers = document.querySelectorAll('.tn-flash-container .alert.alert-dismissible');
+        if (flashContainers.length > 0) {
+            log('Inicjalizacja automatycznego zamykania Flash Messages dla', flashContainers.length, 'elementów.');
+            window.setTimeout(() => {
+                flashContainers.forEach(alert => {
+                    try {
+                        // Użyj getOrCreateInstance dla pewności, że instancja istnieje, a następnie spróbuj ją zamknąć.
+                        const alertInstance = bootstrap.Alert.getOrCreateInstance(alert);
+                        if (alertInstance) {
+                            alertInstance.close();
+                        }
+                    } catch (e) {
+                        // Logowanie błędu, jeśli zamknięcie alertu się nie powieśćie (np. brak Bootstrapa lub problem z elementem).
+                        console.warn("TN_LOG: Błąd zamykania alertu:", e, alert);
+                    }
+                });
+            }, 7000); // 7000 milisekund = 7 sekund
+        }
+    };
+
+    /**
+     * Inicjalizuje podpowiedzi Bootstrap (tooltips).
+     * Działa na wszystkich elementach z atrybutem 'data-bs-toggle="tooltip"'.
+     * Podpowiedzi pojawiają się przy najechaniu myszą ('trigger: 'hover'').
+     */
+    app.initTooltips = function() {
+        // Pobierz wszystkie elementy, które powinny mieć tooltip.
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        if (tooltipTriggerList.length > 0) {
+             log('Inicjalizacja Tooltips dla', tooltipTriggerList.length, 'elementów.');
+             // Dla każdego elementu utwórz nową instancję Tooltip.
+             tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl, { trigger: 'hover' })); // Tooltip pojawia się przy najechaniu myszą.
+        }
+    };
+
+    /**
+     * Inicjalizuje przełącznik motywu (ciemny/jasny/auto).
+     * Logika pobierania/ustawiania motywu z Local Storage i reagowania na preferencje systemowe.
+     */
+    app.initThemeSwitcher = function() {
+        log('Inicjalizacja Theme Switcher.');
+
+        // Funkcje pomocnicze do zarządzania motywem w Local Storage.
+        const getStoredTheme = () => localStorage.getItem('tn_theme');
+        const setStoredTheme = theme => localStorage.setItem('tn_theme', theme);
+
+        // Sprawdza, czy przeglądarka obsługuje prefers-color-scheme i czy preferuje ciemny motyw.
+        const prefersDark = () => window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        // Określa preferowany motyw: najpierw z Local Storage, potem z preferencji systemowych, na końcu domyślnie 'light'.
+        const getPreferredTheme = () => getStoredTheme() || (prefersDark() ? 'dark' : 'light');
+
+        // Aktualizuje ikony i klasy 'active' w UI przełącznika motywu (np. w dropdownie).
+        const updateThemeUI = (themeValue) => {
+             // Określ rzeczywisty motyw, który zostanie zastosowany (dla 'auto' zależy od preferencji systemowych).
+             const actualTheme = (themeValue === 'auto') ? (prefersDark() ? 'dark' : 'light') : themeValue;
+             // log('Aktualizacja UI motywu dla:', themeValue, '(rzeczywisty:', actualTheme, ')');
+
+             // Aktualizacja ikony w topbarze (jeśli istnieje element z klasą '.tn-theme-icon').
+             const themeIcon = document.querySelector('.tn-theme-icon');
+             // Znajdź element w dropdownie odpowiadający wybranej wartości motywu, aby pobrać z niego klasę ikony.
+             const dropdownItemForIcon = document.querySelector(`.dropdown-item[data-bs-theme-value="${themeValue}"]`);
+             // Użyj klasy ikony z elementu dropdown, jako fallback użyj ikon light/dark.
+             const itemIconClass = dropdownItemForIcon ? dropdownItemForIcon.querySelector('i:first-child')?.className : (actualTheme === 'dark' ? 'bi-moon-stars-fill' : 'bi-sun-fill');
+
+             if (themeIcon && itemIconClass) {
+                  // Znajdź klasę ikony Bootstrap (zaczyna się od 'bi-').
+                  const currentIconBaseClass = itemIconClass.split(' ').find(cls => cls.startsWith('bi-'));
+                  if(currentIconBaseClass) {
+                       // Zastąp tylko klasę ikony, zachowując inne klasy (np. fs-5, me-2).
+                       const otherClasses = Array.from(themeIcon.classList).filter(cls => !cls.startsWith('bi-') && cls !== 'bi');
+                       themeIcon.className = `bi ${currentIconBaseClass} ${otherClasses.join(' ')} tn-theme-icon`;
+                  }
+             }
+
+             // Aktualizacja znacznika 'active' i ikony 'check' w elementach dropdownu wyboru motywu.
+             document.querySelectorAll('.dropdown-item[data-bs-theme-value]').forEach(el => {
+                el.classList.remove('active'); // Usuń klasę 'active' ze wszystkich elementów.
+                const check = el.querySelector('.bi-check.ms-auto'); // Znajdź istniejącą ikonę 'check'.
+                if(check) check.remove(); // Usuń ikonę 'check'.
+            });
+            // Znajdź element odpowiadający wybranej wartości motywu.
+            const activeBtn = document.querySelector(`.dropdown-item[data-bs-theme-value="${themeValue}"]`);
+            if(activeBtn) {
+                activeBtn.classList.add('active'); // Dodaj klasę 'active'.
+                // Dodaj ikonę 'check', jeśli jej jeszcze nie ma.
+                if (!activeBtn.querySelector('.bi-check.ms-auto')) {
+                    const check = document.createElement('i');
+                    check.className = 'bi bi-check ms-auto'; // Klasy dla ikony 'check' Bootstrap Icons.
+                    activeBtn.appendChild(check);
+                }
+            }
+        };
+
+        // Ustawia motyw aplikacji (atrybut data-bs-theme na elemencie <html>) i aktualizuje UI.
+        const setTheme = themeValue => {
+            let themeToSet = themeValue;
+            // Jeśli wybrano 'auto', określ motyw na podstawie preferencji systemowych.
+            if (themeValue === 'auto') {
+                themeToSet = prefersDark() ? 'dark' : 'light';
+            }
+            // Ustaw atrybut data-bs-theme na elemencie <html>, co Bootstrap wykorzystuje do zmiany stylów.
+            document.documentElement.setAttribute('data-bs-theme', themeToSet);
+            // log('Ustawiono motyw HTML na:', themeToSet);
+            // Zawsze aktualizuj UI na podstawie *wybranej* wartości (light/dark/auto), nie rzeczywistej,
+            // aby poprawnie zaznaczyć aktywną opcję w dropdownie.
+            updateThemeUI(themeValue);
+        };
+
+        // --- Inicjalizacja ---
+        // Ustaw motyw przy ładowaniu strony na podstawie zapisanych preferencji lub domyślnego/systemowego.
+        const initialTheme = getPreferredTheme();
+        setTheme(initialTheme);
+
+        // --- Event Listenery ---
+        // Dodaj listenery do elementów wyboru motywu w dropdownie.
+        document.querySelectorAll('[data-bs-theme-value]').forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const val = toggle.getAttribute('data-bs-theme-value'); // Pobierz wartość motywu z atrybutu data.
+                // log('Kliknięto opcję motywu:', val);
+                setStoredTheme(val); // Zapisz wybór użytkownika w Local Storage.
+                setTheme(val); // Ustaw motyw aplikacji.
+            });
+        });
+
+        // Dodaj listener na zmianę preferencji systemowych (tylko jeśli przeglądarka to obsługuje).
+        // Reaguje tylko wtedy, gdy użytkownik wybrał motyw 'auto'.
+        if (window.matchMedia) {
+             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                 if (getStoredTheme() === 'auto') {
+                     log('Zmiana preferencji systemowych, motyw ustawiony na auto.');
+                     setTheme('auto'); // Zastosuj 'auto' ponownie, aby odświeżyć motyw.
+                 }
+             });
+        }
+    };
+
+
+    // --- Obsługa Modala Produktu (Dodawanie/Edycja) ---
+    app.productModal = null; // Zmienna do przechowywania instancji modala Bootstrap.
+
+    app.initProductModal = function() {
+        const element = document.getElementById('productModal'); // Element modala.
+        if (!element) return; // Jeśli element nie istnieje, przerwij inicjalizację.
+        log('Inicjalizacja Product Modal.');
+        // Pobierz lub utwórz instancję modala Bootstrapa.
+        this.productModal = bootstrap.Modal.getOrCreateInstance(element);
+
+        // Pobierz referencje do kluczowych elementów formularza w modalu.
+        const form = document.getElementById('productForm');
+        const productIdInput = document.getElementById('productId'); // Ukryte pole na ID produktu (dla edycji).
+        const locationSelect = document.getElementById('productLocationSelect'); // Select wyboru lokalizacji.
+        const locationHelp = document.getElementById('productLocationHelp'); // Element tekstowy pomocy dla lokalizacji.
+        const imagePreview = document.getElementById('imagePreview'); // Element <img> do podglądu obrazka.
+        const imageFile = document.getElementById('productImageFile'); // Pole input type="file" do wyboru obrazka.
+        const descInput = form ? form.querySelector('#productDesc') : null; // Pole textarea opisu produktu.
+
+
+        // --- Event Listener: show.bs.modal ---
+        // Wywoływany tuż przed pokazaniem modala. Używany do przygotowania formularza (reset, ustawienia pól).
+        element.addEventListener('show.bs.modal', (event) => {
+            // Resetuj formularz i usuń klasy walidacji Bootstrapa.
+            if(form) {
+                 form.classList.remove('was-validated'); // Usuń klasy walidacji wizualnej.
+                 form.reset(); // Zresetuj wszystkie pola formularza do wartości domyślnych/pustych.
+            }
+
+            // Sprawdź, czy modal jest otwierany w trybie edycji (na podstawie wartości ukrytego pola ID).
+            // Sprawdzenie musi nastąpić PO ewentualnym wypełnieniu formularza danymi produktu w populateEditForm.
+            // Jednak listener 'show.bs.modal' jest wywoływany ZANIM populateEditForm zdąży wypełnić pola,
+            // więc to sprawdzenie isEditMode tutaj może być niedokładne dla TRYBU EDYCJI wywołanego przez data-bs-toggle.
+            // Lepszym podejściem jest ustawienie trybu w funkcji otwierającej modal (openAddModal/populateEditForm).
+            // Dla uproszczenia, obecna logika opiera się na wartości productIdInput, która jest czyszczona w openAddModal
+            // i ustawiana w populateEditForm PRZED wywołaniem modal.show().
+            const isEditMode = productIdInput && productIdInput.value !== '';
+            log('Otwieranie modala produktu - tryb edycji:', isEditMode);
+
+            // Obsługa pola wyboru lokalizacji w zależności od trybu (dodawanie/edycja).
+            if (locationSelect) {
+                 // W trybie edycji blokujemy zmianę lokalizacji z poziomu tego modala.
+                 locationSelect.disabled = isEditMode;
+                 if (isEditMode) {
+                     locationSelect.value = ""; // Wyczyść wybraną wartość.
+                     // Ustaw tekst pomocy informujący, gdzie zmienić lokalizację.
+                     // Zakładamy, że URL do widoku magazynu jest dostępny globalnie (np. przez funkcję PHP w JS)
+                     // lub w atrybucie data na elemencie body.
+                     const warehouseUrl = typeof tn_generuj_url === 'function' ? tn_generuj_url('warehouse_view') : (document.body.dataset.warehouseUrl || '/magazyn');
+                     if(locationHelp) locationHelp.innerHTML = `Lokalizację zmień w <a href="${warehouseUrl}">Widoku Magazynu</a>.`;
+                 } else {
+                     // W trybie dodawania, ustaw domyślną pierwszą wolną lokalizację, jeśli jest dostępna w konfiguracji.
+                     locationSelect.value = app.config.firstEmptyLocation || "";
+                     // Ustaw standardowy tekst pomocy.
+                     if(locationHelp) locationHelp.innerHTML = 'Opcjonalnie przypisz od razu do miejsca.';
+                 }
+            }
+
+            // Obsługa podglądu obrazka.
+             if (!isEditMode && imagePreview) { // Dla nowego produktu:
+                 imagePreview.style.display = 'none'; // Ukryj element podglądu.
+                 imagePreview.src = '#'; // Wyczyść źródło obrazka.
+                 if (imageFile) imageFile.value = ''; // Wyczyść wartość pola input type="file".
+             }
+             // Dla trybu edycji, podgląd obrazka zostanie ustawiony w funkcji populateEditForm.
+
+             // Komentarz o polu opisu wspierającym HTML (można dodać tooltip lub tekst pomocy obok pola w HTML modala)
+             if (descInput) {
+                 // console.log("Pole 'Opis produktu' (#productDesc) wspiera wprowadzanie kodu HTML.");
+                 // Tutaj można dodać logikę inicjalizacji edytora WYSIWYG, jeśli jest używany.
+             }
+        });
+
+        // --- Event Listener: change na polu input type="file" ---
+        // Obsługuje wybór pliku obrazka i wyświetla jego podgląd.
+        if(imageFile && imagePreview){
+            imageFile.addEventListener('change', evt => {
+                 const files = imageFile.files; // Pobierz listę wybranych plików.
+                 if (files && files[0]) { // Sprawdź, czy wybrano co najmniej jeden plik.
+                     const file = files[0]; // Pobierz pierwszy plik.
+                     const reader = new FileReader(); // Utwórz obiekt FileReader do odczytu zawartości pliku.
+
+                     // Funkcja wywoływana po pomyślnym odczytaniu pliku.
+                     reader.onload = (e) => {
+                         imagePreview.src = e.target.result; // Ustaw źródło obrazka na URL danych (base64) odczytany z pliku.
+                         imagePreview.style.display = 'block'; // Pokaż element podglądu.
+                     };
+                     // Rozpocznij odczyt pliku jako URL danych (base64).
+                     reader.readAsDataURL(file);
+                 } else { // Jeśli żaden plik nie został wybrany (np. użytkownik anulował wybór).
+                     imagePreview.style.display = 'none'; // Ukryj element podglądu.
+                     imagePreview.src = '#'; // Wyczyść źródło obrazka.
+                 }
+            });
+        }
+
+         // Dodaj listener dla kliknięcia w obrazek podglądu w modalu produktu,
+         // aby otworzyć go w większym modalu powiększenia obrazka.
+         if (imagePreview) {
+             imagePreview.style.cursor = 'pointer'; // Zmień kursor, aby zasugerować, że element jest klikalny.
+             imagePreview.addEventListener('click', (event) => {
+                  // Sprawdź, czy podgląd jest widoczny i czy ma ustawione źródło obrazka.
+                  if (imagePreview.style.display !== 'none' && imagePreview.src && imagePreview.src !== '#') {
+                       // Sprawdź, czy źródło nie jest domyślnym placeholderem SVG, który Bootstrap dodaje dla błędów ładowania obrazków.
+                       if (!imagePreview.src.startsWith('data:image/svg+xml')) {
+                            // Wywołaj funkcję showImageModal z URL obrazka i opcjonalnym tytułem.
+                            app.showImageModal(imagePreview.src, 'Podgląd wybranego zdjęcia');
+                       }
+                  }
+             });
+         }
+    };
+
+    /**
+     * Wypełnia formularz produktu danymi do edycji i otwiera modal produktu.
+     * Ta funkcja powinna być wywoływana np. po kliknięciu przycisku "Edytuj" dla konkretnego produktu.
+     * @param {object} product Obiekt zawierający dane produktu do wypełnienia formularza.
+     */
+    app.populateEditForm = function(product) {
+         // DODAJ TĘ LINIĘ DO DEBUGOWANIA:
+         console.log("TN_DEBUG: Dane produktu przekazane do populateEditForm:", product);
+         log('Wypełnianie formularza edycji produktu', product);
+         const modalElement = document.getElementById('productModal');
+         // Sprawdź, czy element modala istnieje i czy przekazano dane produktu.
+         if (!modalElement || !product || typeof product !== 'object') {
+              console.error("TN_LOG: Nie można wypełnić formularza: Brak elementu modala lub danych produktu.");
+              return;
+         }
+         const form = document.getElementById('productForm');
+         if (!form) {
+             console.error("TN_LOG: Nie znaleziono formularza produktu.");
+             return;
+         }
+
+         document.getElementById('productModalLabel').innerHTML = '<i class="bi bi-pencil-square me-2"></i> Edytuj Produkt';
+         // Formularz jest resetowany w listenerze 'show.bs.modal' przed wypełnieniem danymi.
+
+         try {
+             // Wypełnianie pól formularza danymi z obiektu 'product'.
+             // Używamy operatora || '' aby upewnić się, że pola otrzymają pusty string zamiast null/undefined, co może powodować problemy.
+             form.querySelector('#productId').value = product.id || '';
+             form.querySelector('#productName').value = product.name || '';
+             form.querySelector('#productProducent').value = product.producent || '';
+             form.querySelector('#productCatalogNr').value = product.tn_numer_katalogowy || '';
+             // Ustawienie wartości selecta kategorii. Zakładamy, że opcje w selectie mają wartości zgodne z product.category.
+             const categorySelect = form.querySelector('#productCategorySelect');
+             if(categorySelect) categorySelect.value = product.category || '';
+             form.querySelector('#productDesc').value = product.desc || '';
+             form.querySelector('#productSpec').value = product.spec || '';
+             form.querySelector('#productParams').value = product.params || '';
+             form.querySelector('#productVehicle').value = product.vehicle || '';
+             form.querySelector('#productPrice').value = product.price || 0; // Cena domyślnie 0.
+             form.querySelector('#productShipping').value = product.shipping || 0; // Koszt wysyłki domyślnie 0.
+             form.querySelector('#productStock').value = product.stock || 0; // Stan magazynowy domyślnie 0.
+              // Ustawienie wartości selecta jednostki miary. Zakładamy, że opcje mają wartości zgodne z product.tn_jednostka_miary.
+             const unitSelect = form.querySelector('#productUnit');
+             if(unitSelect) unitSelect.value = product.tn_jednostka_miary || '';
+             // Pole ukryte do przechowywania oryginalnej lokalizacji (może być użyte w logice PHP).
+             form.querySelector('#originalWarehouseValue').value = product.warehouse || '';
+
+             // Ustaw nowe placeholdery (mniej typowe dla edycji, ale dla spójności)
+             const catalogNrInput = form.querySelector('#productCatalogNr');
+             if(catalogNrInput) catalogNrInput.placeholder = 'Np. 123456789'; // Numer katalogowy części
+             const producentInput = form.querySelector('#productProducent');
+             if(producentInput) producentInput.placeholder = 'Np. Bosch, ATE'; // Producent Części
+             const nameInput = form.querySelector('#productName');
+             if(nameInput) nameInput.placeholder = 'Np. Filtr oleju'; // Nazwa części
+             const vehicleInput = form.querySelector('#productVehicle');
+             if(vehicleInput) vehicleInput.placeholder = 'Np. Audi A4 B6 1.9 TDI (2001-2004)'; // Pasuje do pojazdów
+             const paramsInput = form.querySelector('#productParams');
+             if(paramsInput) paramsInput.placeholder = 'Np. Średnica: 65mm, Wysokość: 100mm'; // Parametry
+
+
+             // Obsługa podglądu obrazka.
+             const preview = form.querySelector('#imagePreview');
+             // Użyj globalnej funkcji PHP 'tnPobierzSciezkeObrazka' do pobrania ścieżki obrazka, jeśli jest dostępna w JS.
+             // W przeciwnym razie, zbuduj ścieżkę na podstawie konwencji (np. '/TNuploads/' + nazwa_pliku).
+             const imgPath = typeof tnPobierzSciezkeObrazka === 'function' ? tnPobierzSciezkeObrazka(product.image || null) : (product.image ? '/TNuploads/' + product.image : null);
+             // Sprawdź, czy element podglądu istnieje, czy ścieżka obrazka jest dostępna i czy nie jest to placeholder SVG.
+             if (preview && imgPath && !imgPath.startsWith('data:image/svg+xml')) {
+                 preview.src = imgPath;
+                 preview.style.display = 'block'; // Pokaż podgląd.
+             } else if (preview) {
+                 preview.style.display = 'none'; // Ukryj podgląd.
+                 preview.src = '#'; // Wyczyść źródło.
+             }
+
+             // Zablokuj pole wyboru lokalizacji w trybie edycji i ustaw odpowiedni tekst pomocy.
+             const locationSelect = form.querySelector('#productLocationSelect');
+             const locationHelp = form.querySelector('#productLocationHelp');
+             if (locationSelect) {
+                 locationSelect.value = ""; // Wyczyść wybraną wartość.
+                 locationSelect.disabled = true; // Zablokuj pole.
+             }
+              if(locationHelp) {
+                  // Użyj globalnej funkcji PHP do generowania URL, jeśli dostępna w JS.
+                  const warehouseUrl = typeof tn_generuj_url === 'function' ? tn_generuj_url('warehouse_view') : (document.body.dataset.warehouseUrl || '/magazyn');
+                  locationHelp.innerHTML = `Lokalizację zmień w <a href="${warehouseUrl}">Widoku Magazynu</a>.`;
+              }
+
+             // Komentarz o polu opisu wspierającym HTML (można dodać tooltip lub tekst pomocy obok pola w HTML modala)
+             const descInput = form.querySelector('#productDesc');
+             if (descInput) {
+                 // console.log("Pole 'Opis produktu' (#productDesc) wspiera wprowadzanie kodu HTML.");
+                 // Tutaj można dodać logikę inicjalizacji edytora WYSIWYG, jeśli jest używany.
+             }
+
+
+         } catch (e) {
+             console.error("TN_LOG: Błąd podczas wypełniania formularza produktu:", e);
+             // Opcjonalnie: pokaż komunikat błędu użytkownikowi za pomocą funkcji flash message.
+             if (typeof app.showFlashMessage === 'function') {
+                 app.showFlashMessage("Wystąpił błąd podczas ładowania danych produktu do edycji.", "danger");
+             } else {
+                 alert("Wystąpił błąd podczas ładowania danych produktu do edycji.");
+             }
+         }
+
+         // Pobierz instancję modala i pokaż go.
+         const modal = this.productModal || bootstrap.Modal.getOrCreateInstance(modalElement);
+         if(modal) modal.show();
+         else console.error("TN_LOG: Nie można uzyskać instancji modala produktu do pokazania.");
+    };
+
+    /**
+     * Otwiera modal produktu w trybie dodawania nowego produktu.
+     * Ta funkcja powinna być wywoływana np. po kliknięciu przycisku "Dodaj Produkt".
+     */
+    app.openAddModal = function() {
+         log('Otwieranie modala dodawania produktu.');
+         const modalElement = document.getElementById('productModal');
+         if (!modalElement) {
+              console.error("TN_LOG: Nie znaleziono elementu #productModal.");
+              return;
+         }
+         const form = document.getElementById('productForm');
+         if (!form) {
+             console.error("TN_LOG: Nie znaleziono formularza produktu.");
+             return;
+         }
+
+         // Ustaw tytuł modala na "Dodaj Nowy Produkt".
+         document.getElementById('productModalLabel').innerHTML = '<i class="bi bi-plus-circle me-2"></i> Dodaj Nowy Produkt';
+         // Reset formularza i czyszczenie ukrytego pola ID produktu oraz oryginalnej lokalizacji.
+         form.reset();
+         form.querySelector('#productId').value = ''; // Wyczyść ID, aby wskazać tryb dodawania.
+         form.querySelector('#originalWarehouseValue').value = '';
+
+         // Odblokuj pole wyboru lokalizacji i ustaw domyślną pierwszą wolną lokalizację.
+         const locationSelect = form.querySelector('#productLocationSelect');
+         const locationHelp = form.querySelector('#productLocationHelp');
+         if(locationSelect) {
+             locationSelect.disabled = false; // Odblokuj możliwość wyboru lokalizacji.
+             // Ustaw domyślną wartość na pierwszą wolną lokalizację z konfiguracji (jeśli PHP ją przekazało).
+             locationSelect.value = app.config.firstEmptyLocation || "";
+         }
+         // Ustaw standardowy tekst pomocy dla pola lokalizacji.
+         if(locationHelp) {
+             locationHelp.innerHTML = 'Opcjonalnie przypisz od razu do miejsca.';
+         }
+
+         // Ukryj podgląd obrazka i wyczyść wartość pola input type="file".
+         const preview = form.querySelector('#imagePreview');
+         if (preview) {
+             preview.style.display = 'none';
+             preview.src = '#';
+         }
+         const imageFile = document.getElementById('productImageFile');
+         if (imageFile) {
+             imageFile.value = ''; // Wyczyść pole, aby użytkownik mógł wybrać nowy plik.
+         }
+
+         // Ustaw nowe placeholdery
+         const catalogNrInput = form.querySelector('#productCatalogNr');
+         if(catalogNrInput) catalogNrInput.placeholder = 'Np. 123456789'; // Numer katalogowy części
+         const producentInput = form.querySelector('#productProducent');
+         if(producentInput) producentInput.placeholder = 'Np. Bosch, ATE'; // Producent Części
+         const nameInput = form.querySelector('#productName');
+         if(nameInput) nameInput.placeholder = 'Np. Filtr oleju'; // Nazwa części
+         const vehicleInput = form.querySelector('#productVehicle');
+         if(vehicleInput) vehicleInput.placeholder = 'Np. Audi A4 B6 1.9 TDI (2001-2004)'; // Pasuje do pojazdów
+         const paramsInput = form.querySelector('#productParams');
+         if(paramsInput) paramsInput.placeholder = 'Np. Średnica: 65mm, Wysokość: 100mm'; // Parametry
+
+         // Komentarz o polu opisu wspierającym HTML (można dodać tooltip lub tekst pomocy obok pola w HTML modala)
+         const descInput = form.querySelector('#productDesc');
+         if (descInput) {
+             // console.log("Pole 'Opis produktu' (#productDesc) wspiera wprowadzanie kodu HTML.");
+             // Tutaj można dodać logikę inicjalizacji edytora WYSIWYG, jeśli jest używany.
+         }
+
+
+         // Pobierz instancję modala i pokaż go.
+         const modal = this.productModal || bootstrap.Modal.getOrCreateInstance(modalElement);
+         if(modal) modal.show();
+         else console.error("TN_LOG: Nie można uzyskać instancji modala produktu do pokazania.");
+    };
+
+
+    // --- Obsługa Modala Zamówienia (Dodawanie/Edycja) ---
+    app.orderModal = null; // Zmienna do przechowywania instancji modala Bootstrap.
+
+    app.initOrderModal = function() {
+        const element = document.getElementById('orderModal'); // Element modala.
+        if(!element) return; // Jeśli element nie istnieje, przerwij inicjalizację.
+        log('Inicjalizacja Order Modal.');
+        // Pobierz lub utwórz instancję modala Bootstrapa.
+        this.orderModal = bootstrap.Modal.getOrCreateInstance(element);
+
+        // --- Logika Sprawdzania Stanu Magazynowego w Modalu Zamówienia ---
+        // Ta sekcja dodaje listenery do pól produktu i ilości, aby ostrzegać, gdy ilość przekracza stan.
+        const productSelect = element.querySelector('#order_product_id'); // Select wyboru produktu.
+        const quantityInput = element.querySelector('#order_quantity'); // Input ilości.
+        const quantityWarning = element.querySelector('#quantity_warning'); // Element do wyświetlania ostrzeżenia.
+
+        // Funkcja lokalna do sprawdzania stanu magazynowego.
+        const checkStock = () => {
+           // Sprawdź, czy wszystkie wymagane elementy istnieją.
+           if (!productSelect || !quantityInput || !quantityWarning) {
+               // Jeśli brakuje elementu ostrzeżenia, upewnij się, że jest ukryte.
+               if(quantityWarning) quantityWarning.style.display = 'none';
+               return;
+           }
+
+           const selectedOption = productSelect.options[productSelect.selectedIndex]; // Pobierz wybraną opcję produktu.
+           // Sprawdź, czy wybrano jakąś opcję, czy ma wartość, czy nie jest wyłączona i czy ma dane o stanie magazynowym.
+           if (!selectedOption || selectedOption.value === "" || selectedOption.disabled || !selectedOption.dataset.stock) {
+               quantityWarning.style.display = 'none'; // Ukryj ostrzeżenie, jeśli produkt nie jest wybrany lub brak danych o stanie.
+               return;
+           }
+
+           const stock = parseInt(selectedOption.dataset.stock, 10); // Pobierz stan magazynowy z atrybutu data-stock.
+           const quantity = parseInt(quantityInput.value, 10); // Pobierz wpisaną ilość.
+
+           // Określ, czy wpisana ilość przekracza stan magazynowy (i czy ilość jest większa od zera).
+           const exceedsStock = (!isNaN(stock) && !isNaN(quantity) && quantity > stock && quantity > 0);
+           quantityWarning.style.display = exceedsStock ? 'block' : 'none'; // Pokaż/ukryj element ostrzeżenia.
+
+           if (exceedsStock) {
+               // Ustaw treść ostrzeżenia i klasy CSS dla odpowiedniego wyglądu (np. żółte tło).
+               quantityWarning.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i> Ostrzeżenie: Na stanie tylko ${stock} sztuk!`;
+               quantityWarning.classList.remove('alert-info'); // Usuń domyślny styl info.
+               quantityWarning.classList.add('alert-warning'); // Dodaj styl ostrzeżenia.
+           } else {
+                // Jeśli ilość nie przekracza stanu lub jest <= 0, ukryj ostrzeżenie lub pokaż inny komunikat.
+                quantityWarning.classList.remove('alert-warning'); // Usuń styl ostrzeżenia.
+                quantityWarning.classList.add('alert-info'); // Opcjonalnie: dodaj inny styl lub po prostu ukryj.
+                quantityWarning.innerHTML = ''; // Wyczyść treść komunikatu.
+                quantityWarning.style.display = 'none'; // Upewnij się, że jest ukryte, jeśli nie ma treści.
+           }
+        };
+
+        // Podpinamy listenery zdarzeń:
+        // - 'change' na selectcie produktu: reaguje na zmianę wybranego produktu.
+        // - 'input' na inputcie ilości: reaguje na każdą zmianę wartości w polu ilości.
+        if(productSelect) productSelect.addEventListener('change', checkStock);
+        if(quantityInput) quantityInput.addEventListener('input', checkStock);
+
+        // Sprawdź stan magazynowy przy otwieraniu modala.
+        element.addEventListener('show.bs.modal', () => {
+            // Użyj setTimeout z małym opóźnieniem, aby dać przeglądarce czas na odświeżenie DOM,
+            // zwłaszcza jeśli opcje selecta są ładowane dynamicznie lub wartość jest ustawiana przez JS.
+            setTimeout(checkStock, 50);
+            // Zresetuj wizualną walidację formularza przy otwarciu modala.
+            const form = element.querySelector('form');
+            if(form) form.classList.remove('was-validated');
+        });
+        // --- Koniec Logiki Sprawdzania Stanu ---
+    };
+
+     /**
+      * Ustawia dane w modalu zamówienia (do dodania lub edycji) i go otwiera.
+      * Ta funkcja powinna być wywoływana np. po kliknięciu przycisku "Dodaj Zamówienie" lub "Edytuj Zamówienie".
+      * @param {object|null} order Obiekt zawierający dane zamówienia do edycji (jeśli null, modal otworzy się w trybie dodawania).
+      */
+    app.setupOrderModal = function(order = null) { // Otwiera i wypełnia modal zamówienia
+         log('Ustawianie/wypełnianie modala zamówienia', order);
+         const modalElement = document.getElementById('orderModal');
+         if (!modalElement) {
+             console.error("TN_LOG: Element #orderModal nie znaleziony.");
+             // Pokaż komunikat błędu użytkownikowi.
+             if (typeof app.showFlashMessage === 'function') {
+                 app.showFlashMessage("Błąd: Nie znaleziono elementu modala zamówienia.", "danger");
+             } else {
+                 alert("Błąd: Nie znaleziono elementu modala zamówienia.");
+             }
+             return;
+         }
+         const form = document.getElementById('orderForm');
+         if (!form) {
+             console.error("TN_LOG: Formularz zamówienia nie znaleziony.");
+             // Pokaż komunikat błędu użytkownikowi.
+             if (typeof app.showFlashMessage === 'function') {
+                 app.showFlashMessage("Błąd: Nie znaleziono formularza zamówienia.", "danger");
+             } else {
+                 alert("Błąd: Nie znaleziono formularza zamówienia.");
+             }
+             return;
+         }
+
+         // Pobierz instancję modala.
+         const modal = this.orderModal || bootstrap.Modal.getOrCreateInstance(modalElement);
+         if(!modal) {
+             console.error("TN_LOG: Nie można uzyskać instancji modala zamówienia do ustawienia.");
+              if (typeof app.showFlashMessage === 'function') {
+                 app.showFlashMessage("Błąd: Nie można zainicjalizować modala zamówienia.", "danger");
+             } else {
+                 alert("Błąd: Nie można zainicjalizować modala zamówienia.");
+             }
+             return;
+         }
+
+         form.reset(); // Zawsze resetuj przed wypełnieniem/otwarciem.
+
+         if (order && typeof order === 'object' && order.id) { // Tryb edycji zamówienia.
+             document.getElementById('orderModalLabel').innerText = 'Edytuj zamówienie ID: ' + order.id;
+             try {
+                 form.querySelector('#edit_order_id').value = order.id; // Ustaw ukryte pole z ID zamówienia.
+                 // Ustawienie wartości pól select (produkt, status, status płatności, kurier).
+                 // Zakładamy, że opcje w selectach mają wartości zgodne z danymi zamówienia.
+                 const productSelect = form.querySelector('#order_product_id');
+                 if(productSelect) productSelect.value = order.product_id || '';
+                 const statusSelect = form.querySelector('#order_status');
+                 if(statusSelect) statusSelect.value = order.status || 'Nowe';
+                 const paymentStatusSelect = form.querySelector('#order_payment_status');
+                 if(paymentStatusSelect) paymentStatusSelect.value = order.tn_status_platnosci || '';
+                 const courierSelect = form.querySelector('#order_courier_id');
+                 if(courierSelect) courierSelect.value = order.courier_id || '';
+
+                 // Ustawienie wartości pól input (ilość, nazwa kupującego, dane wysyłki, numer śledzenia).
+                 form.querySelector('#order_quantity').value = order.quantity || 1; // Domyślna ilość = 1.
+                 form.querySelector('#order_buyer_name').value = order.buyer_name || '';
+                 form.querySelector('#order_buyer_daneWysylki').value = order.buyer_daneWysylki || '';
+                 form.querySelector('#order_tracking_number').value = order.tracking_number || '';
+
+             } catch(e){
+                 console.error("TN_LOG: Błąd wypełniania modala zamówienia:", e);
+                 // Pokaż komunikat błędu użytkownikowi.
+                 if (typeof app.showFlashMessage === 'function') {
+                     app.showFlashMessage("Wystąpił błąd podczas ładowania danych zamówienia do edycji.", "danger");
+                 } else {
+                     alert("Wystąpił błąd podczas ładowania danych zamówienia do edycji.");
+                 }
+             }
+         } else { // Tryb dodawania nowego zamówienia.
+             document.getElementById('orderModalLabel').innerText = 'Dodaj nowe zamówienie';
+             form.querySelector('#edit_order_id').value = ''; // Wyczyść ID, aby wskazać tryb dodawania.
+             // Ustawienia domyślne dla nowego zamówienia.
+             const statusSelect = form.querySelector('#order_status');
+             if(statusSelect) statusSelect.value = 'Nowe'; // Domyślny status: Nowe.
+             const paymentStatusSelect = form.querySelector('#order_payment_status');
+             if(paymentStatusSelect) paymentStatusSelect.value = ''; // Domyślny status płatności: pusty.
+             const courierSelect = form.querySelector('#order_courier_id');
+             if(courierSelect) courierSelect.value = ''; // Domyślny kurier: pusty.
+             // Pola ilości, nazwy kupującego, danych wysyłki, numeru śledzenia będą puste po form.reset().
+         }
+         // Sprawdzenie stanu magazynowego nastąpi automatycznie dzięki listenerowi 'show.bs.modal' podpiętemu w initOrderModal.
+         modal.show(); // Pokaż modal.
+    };
+
+     /**
+      * Otwiera modal zamówienia z domyślnie wybranym produktem.
+      * Używane np. z widoku szczegółów produktu, aby szybko utworzyć zamówienie na ten produkt.
+      * @param {string|number} productId ID produktu, który ma być domyślnie wybrany w selectcie modala.
+      */
+    app.tnOtworzModalZamowienia = function(productId) { // Funkcja wywoływana np. z HTML przycisku "Zamów" w widoku produktu.
+         log('Otwieranie modala zamówienia dla produktu ID:', productId);
+         const modalElement = document.getElementById('orderModal');
+         const productSelect = document.getElementById('order_product_id');
+         const quantityInput = document.getElementById('order_quantity');
+
+         // Sprawdź, czy wszystkie wymagane elementy istnieją.
+         if (!modalElement || !productSelect || !quantityInput) {
+             console.error("TN_LOG: Brak wymaganych elementów modala zamówienia (#orderModal, #order_product_id, #order_quantity).");
+             if(typeof app.showFlashMessage === 'function') app.showFlashMessage("Błąd inicjalizacji modala zamówienia.", "danger");
+             return;
+         }
+
+         // Resetuj formularz i pokaż modal w trybie dodawania nowego zamówienia.
+         this.setupOrderModal(null);
+
+         // Spróbuj znaleźć i ustawić opcję produktu odpowiadającą przekazanemu ID.
+         const option = productSelect.querySelector('option[value="' + productId + '"]');
+         // Sprawdź, czy przekazano ID produktu, czy opcja dla tego ID istnieje w selectcie i czy nie jest wyłączona.
+         if (productId && option && !option.disabled) { // Jeśli produkt jest dostępny na liście.
+              productSelect.value = productId; // Ustaw wybraną wartość selecta.
+              quantityInput.value = 1; // Ustaw domyślną ilość na 1.
+              // Sprawdzenie stanu magazynowego nastąpi automatycznie dzięki listenerom.
+         } else if (productId) { // Jeśli przekazano ID, ale opcja nie istnieje lub jest wyłączona.
+             console.warn(`TN_LOG: Produkt o ID "${productId}" nie znaleziony lub niedostępny na liście produktów w modalu.`);
+             // Pokaż komunikat informujący użytkownika, że produkt jest niedostępny.
+             if(typeof app.showFlashMessage === 'function') app.showFlashMessage('Wybrany produkt jest niedostępny w magazynie lub wystąpił błąd.', 'warning');
+             productSelect.value = ''; // Upewnij się, że nic nie jest wybrane w selectcie.
+             quantityInput.value = 1; // Zostaw domyślną ilość.
+         }
+         // Jeśli productId był null/undefined, modal otworzy się pusty, co jest prawidłowe dla dodawania bez wstępnie wybranego produktu.
+    };
+
+
+    // --- Obsługa Modala Przypisywania do Magazynu ---
+    app.assignWarehouseModal = null; // Zmienna do przechowywania instancji modala Bootstrap.
+
+    app.initAssignWarehouseModal = function() {
+        const element = document.getElementById('assignWarehouseModal'); // Element modala.
+        if(!element) return; // Jeśli element nie istnieje, przerwij inicjalizację.
+        log('Inicjalizacja Assign Warehouse Modal.');
+        // Pobierz lub utwórz instancję modala Bootstrapa.
+        this.assignWarehouseModal = bootstrap.Modal.getOrCreateInstance(element);
+
+        // Dodaj event listenery do slotów magazynowych, które otwierają ten modal.
+        // Ta metoda (querySelectorAll + forEach) działa, ale przy bardzo dużej liczbie slotów
+        // lepszym rozwiązaniem byłaby delegacja zdarzeń na kontenerze nadrzędnym.
+        document.querySelectorAll('.tn-location-slot[data-bs-toggle="modal"][data-bs-target="#assignWarehouseModal"]').forEach(slot => {
+            slot.style.cursor = 'pointer'; // Zmień kursor na wskaźnik, aby wskazać klikalność.
+            slot.addEventListener('click', (event) => {
+                const locationId = event.currentTarget.dataset.locationId; // Pobierz ID lokalizacji z atrybutu data.
+                if (locationId) {
+                    this.setupAssignModal(locationId); // Wywołaj funkcję ustawiającą modal dla danej lokalizacji.
+                } else {
+                     console.warn("TN_LOG: Kliknięty slot magazynowy nie ma data-location-id.");
+                     if(typeof app.showFlashMessage === 'function') app.showFlashMessage("Błąd: Nie można zidentyfikować miejsca w magazynie.", "warning");
+                }
+            });
+        });
+
+         // --- Logika Sprawdzania Stanu Magazynowego w Modalu Przypisania ---
+         // Ta sekcja dodaje listenery do pól produktu i ilości, aby ostrzegać, gdy ilość przekracza stan "nieprzypisany".
+         const productAssignSelect = element.querySelector('#modal_product_id'); // Select wyboru produktu.
+         const quantityAssignInput = element.querySelector('#modal_quantity'); // Input ilości.
+         const quantityAssignWarning = element.querySelector('#assign_quantity_warning'); // Element do wyświetlania ostrzeżenia.
+
+         // Funkcja lokalna do sprawdzania stanu "nieprzypisany".
+         const checkAssignStock = () => {
+             // Sprawdź, czy wszystkie wymagane elementy istnieją.
+             if (!productAssignSelect || !quantityAssignInput || !quantityAssignWarning) {
+                 if(quantityAssignWarning) quantityAssignWarning.style.display = 'none';
+                 return;
+             }
+             const selectedOption = productAssignSelect.options[productAssignSelect.selectedIndex]; // Pobierz wybraną opcję produktu.
+
+             // Sprawdź, czy wybrano opcję produktu, czy ma wartość, czy nie jest wyłączona i czy ma dane o stanie "nieprzypisany".
+             // Zakładamy, że select dla przypisywania pokazuje TYLKO produkty ze stanem > 0, które NIE SĄ przypisane do żadnej lokalizacji.
+             // Atrybut data-stock w opcji powinien zawierać ten stan "nieprzypisany".
+             if (!selectedOption || selectedOption.value === "" || selectedOption.disabled || !selectedOption.dataset.stock) {
+                 quantityAssignWarning.style.display = 'none'; // Ukryj ostrzeżenie.
+                 return;
+             }
+
+             const stock = parseInt(selectedOption.dataset.stock, 10); // Pobierz stan "nieprzypisany" z data-stock.
+             const quantity = parseInt(quantityAssignInput.value, 10); // Pobierz wpisaną ilość.
+
+             // Określ, czy wpisana ilość przekracza stan "nieprzypisany" (i czy ilość jest większa od zera).
+             const exceedsStock = (!isNaN(stock) && !isNaN(quantity) && quantity > stock && quantity > 0);
+             quantityAssignWarning.style.display = exceedsStock ? 'block' : 'none'; // Pokaż/ukryj element ostrzeżenia.
+
+             if (exceedsStock) {
+                  // Ustaw treść ostrzeżenia i klasy CSS.
+                  quantityAssignWarning.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i> Ostrzeżenie: Możesz przypisać maksymalnie ${stock} sztuk (dostępny stan 'nieprzypisany').`;
+                  quantityAssignWarning.classList.remove('alert-info');
+                  quantityAssignWarning.classList.add('alert-warning');
+             } else {
+                  // Jeśli ilość nie przekracza stanu, ukryj ostrzeżenie.
+                  quantityAssignWarning.classList.remove('alert-warning');
+                  quantityAssignWarning.classList.add('alert-info');
+                  quantityAssignWarning.innerHTML = '';
+                  quantityAssignWarning.style.display = 'none';
+             }
+         };
+
+         // Podpinamy listenery zdarzeń:
+         // - 'change' na selectcie produktu: reaguje na zmianę wybranego produktu.
+         // - 'input' na inputcie ilości: reaguje na każdą zmianę wartości w polu ilości.
+         if(productAssignSelect) productAssignSelect.addEventListener('change', checkAssignStock);
+         if(quantityAssignInput) quantityAssignInput.addEventListener('input', checkAssignStock);
+
+         // Sprawdź stan "nieprzypisany" przy otwieraniu modala.
+         element.addEventListener('show.bs.modal', () => {
+              // Użyj setTimeout, aby dać przeglądarce czas na odświeżenie DOM.
+              setTimeout(checkAssignStock, 50);
+              // Zresetuj walidację wizualną.
+              const form = element.querySelector('form');
+              if(form) form.classList.remove('was-validated');
+         });
+          // --- Koniec Logiki Sprawdzania Stanu ---
+     };
+
+     /**
+      * Ustawia ID lokalizacji w modalu przypisania i go otwiera.
+      * Ta funkcja jest wywoływana przez listener kliknięcia na slocie magazynowym.
+      * @param {string} locationId ID miejsca w magazynie, do którego ma zostać przypisany produkt.
+      */
+    app.setupAssignModal = function(locationId) { // Otwiera i ustawia ID lokalizacji w modalu przypisania
+        log('Ustawianie modala przypisania dla lokalizacji:', locationId);
+        const modalElement = document.getElementById('assignWarehouseModal');
+        if (!modalElement) {
+            console.error("TN_LOG: Element #assignWarehouseModal nie znaleziony.");
+             if(typeof app.showFlashMessage === 'function') app.showFlashMessage("Błąd: Nie znaleziono elementu modala przypisania.", "danger");
+            return;
+        }
+        if (!locationId) {
+            console.error("TN_LOG: Brak ID lokalizacji do ustawienia modala przypisania.");
+             if(typeof app.showFlashMessage === 'function') app.showFlashMessage("Błąd: Brak ID lokalizacji magazynu.", "warning");
+            return;
+        }
+
+        // Pobierz instancję modala.
+        const modal = this.assignWarehouseModal || bootstrap.Modal.getOrCreateInstance(modalElement);
+        if (!modal) {
+            console.error("TN_LOG: Nie można uzyskać instancji modala przypisania.");
+             if(typeof app.showFlashMessage === 'function') app.showFlashMessage("Błąd: Nie można zainicjalizować modala przypisania.", "danger");
+            return;
+        }
+
+        const form = document.getElementById('assignWarehouseForm');
+        const locationIdInput = document.getElementById('modal_location_id'); // Ukryte pole na ID lokalizacji.
+        const locationDisplay = document.getElementById('modal_location_display_id'); // Element do wyświetlenia ID lokalizacji w modalu.
+        const productAssignSelect = document.getElementById('modal_product_id'); // Select wyboru produktu.
+        const quantityAssignInput = document.getElementById('modal_quantity'); // Input ilości.
+
+        if(form) form.reset(); // Wyczyść formularz przed wypełnieniem.
+        // Ukryj element ostrzeżenia o stanie.
+        const warning = document.getElementById('assign_quantity_warning');
+        if(warning) {
+             warning.style.display = 'none';
+             warning.innerHTML = ''; // Wyczyść tekst ostrzeżenia.
+             warning.classList.remove('alert-warning', 'alert-info'); // Usuń klasy stylów.
+        }
+
+
+        if (locationIdInput) {
+            locationIdInput.value = locationId; // Ustaw wartość ukrytego pola.
+        }
+        if (locationDisplay) {
+            locationDisplay.textContent = locationId; // Wyświetl ID lokalizacji w widocznym miejscu modala.
+        }
+        if(productAssignSelect) {
+             productAssignSelect.value = ''; // Wyczyść poprzedni wybór produktu.
+             // Opcje selecta powinny być załadowane przez PHP i zawierać tylko produkty "nieprzypisane".
+        }
+        if(quantityAssignInput) {
+             quantityAssignInput.value = 1; // Ustaw domyślną ilość na 1.
+        }
+
+        modal.show(); // Pokaż modal.
+    };
+
+
+    // --- Filtrowanie Widoku Magazynu ---
+    app.initWarehouseFilters = function() {
+        const filterStatusSelect = document.getElementById('tn_filter_status'); // Select filtra statusu.
+        const filterTextInput = document.getElementById('tn_filter_text'); // Input tekstowy filtra.
+
+        // Sprawdź, czy istnieją elementy filtrów.
+        if (filterStatusSelect || filterTextInput) {
+            log('Inicjalizacja Filtrów Magazynu.');
+            // Podpinamy event listener do selecta statusu.
+            if (filterStatusSelect) {
+                filterStatusSelect.addEventListener('change', () => this.filterWarehouseView()); // Wywołaj filtrowanie przy zmianie wybranej opcji.
+            }
+            // Podpinamy event listener do inputu tekstowego.
+            if (filterTextInput) {
+                 // Listener 'input' reaguje na każdą zmianę wartości w polu (wpisywanie, usuwanie).
+                 filterTextInput.addEventListener('input', () => this.filterWarehouseView());
+                 // Listener 'search' reaguje na kliknięcie przycisku [x] w polu wyszukiwania w niektórych przeglądarkach.
+                 filterTextInput.addEventListener('search', () => {
+                     // Jeśli pole tekstowe jest puste (po kliknięciu [x]), wywołaj filtrowanie, aby zresetować filtr tekstowy.
+                     if (filterTextInput.value === '') this.filterWarehouseView();
+                 });
+             }
+             // Wywołaj filtrowanie raz na starcie, aby zastosować domyślne wartości filtrów (np. ustawione przez PHP).
+             // Użyj setTimeout z małym opóźnieniem, aby upewnić się, że DOM jest w pełni gotowy i wartości filtrów są ustawione.
+             setTimeout(() => this.filterWarehouseView(), 100); // 100ms opóźnienia.
+        } else {
+            log('Elementy filtrów magazynu nie znalezione. Inicjalizacja filtrowania pominięta.');
+        }
+    };
+
+    /**
+     * Filtruje widok magazynu (sloty i regały) na podstawie wybranych filtrów statusu i tekstu.
+     */
+    app.filterWarehouseView = function() {
+        log('Filtrowanie widoku magazynu...');
+        // Pobierz aktualne wartości filtrów.
+        const filterStatusSelect = document.getElementById('tn_filter_status');
+        const filterTextInput = document.getElementById('tn_filter_text');
+        const selectedStatus = filterStatusSelect ? filterStatusSelect.value : 'all'; // Domyślny status to 'all'.
+        const searchText = filterTextInput ? filterTextInput.value.toLowerCase().trim() : ''; // Pobierz tekst i przekształć na małe litery.
+
+        // Pobierz wszystkie sloty magazynowe i karty regałów.
+        const locationSlots = document.querySelectorAll('.tn-location-slot');
+        const regalCards = document.querySelectorAll('.tn-regal-card');
+
+        if (locationSlots.length === 0 && regalCards.length === 0) {
+            log('Brak slotów lub regałów do filtrowania.');
+            return; // Nic do filtrowania.
+        }
+
+        let visibleSlotsInRegal = {}; // Obiekt do śledzenia, ile slotów jest widocznych w każdym regale.
+
+        // --- Filtruj sloty magazynowe ---
+        locationSlots.forEach(slot => {
+            const slotStatus = slot.dataset.status || ''; // Pobierz status slotu z data-atrybutu.
+            const slotFilterText = slot.dataset.filterText ? slot.dataset.filterText.toLowerCase() : ''; // Pobierz tekst do filtrowania z data-atrybutu i przekształć na małe litery.
+            const slotRegalId = slot.closest('.tn-regal-card')?.dataset.regalId || 'BEZ_REGALU'; // Pobierz ID regału, do którego należy slot. Użyj 'BEZ_REGALU' dla slotów poza regałami.
+
+            // Sprawdź dopasowanie statusu:
+            // - 'all': pasuje każdy status.
+            // - konkretny status: pasuje tylko slot z tym statusem.
+            // - 'error': pasuje status 'error' (dodatkowo obsłużone, aby nie był ukrywany, gdy filtr to 'all').
+            const statusMatch = (selectedStatus === 'all' || slotStatus === selectedStatus || (selectedStatus === 'error' && slotStatus === 'error'));
+
+            // Sprawdź dopasowanie tekstu:
+            // - pusty tekst: pasuje każdy slot.
+            // - wpisany tekst: pasuje, jeśli tekst do filtrowania slotu zawiera wpisany tekst.
+            const textMatch = (searchText === '' || (slotFilterText && slotFilterText.includes(searchText)));
+
+            // Określ, czy slot powinien być widoczny.
+            let showSlot = statusMatch && textMatch;
+
+            // Specjalna obsługa dla statusu 'error': jeśli filtr nie jest 'all' ani 'error', sloty z 'error' powinny być ukryte.
+            // Ta linia w oryginalnym kodzie wydaje się być powtórzeniem lub nie do końca jasna,
+            // poprzednia linia `let showSlot = statusMatch && textMatch;` już to w zasadzie ogarnia,
+            // ale zostawiam podobną logikę dla zgodności.
+            // Poprawiona logika: jeśli filtr statusu jest ustawiony na coś innego niż 'all' lub 'error',
+            // a status slotu to 'error', to slot powinien być ukryty, chyba że filtr statusu to 'error'.
+             if (slotStatus === 'error' && selectedStatus !== 'all' && selectedStatus !== 'error') {
+                 showSlot = false;
+             }
+
+
+            // Pokaż lub ukryj slot.
+            slot.classList.toggle('tn-hidden', !showSlot);
+
+            // Jeśli slot jest widoczny, zwiększ licznik widocznych slotów dla jego regału.
+            if (showSlot && slotRegalId) {
+                visibleSlotsInRegal[slotRegalId] = (visibleSlotsInRegal[slotRegalId] || 0) + 1;
+            }
+        });
+
+        // --- Filtruj karty regałów ---
+        regalCards.forEach(card => {
+            const regalId = card.dataset.regalId || 'BEZ_REGALU'; // Pobierz ID regału z data-atrybutu.
+            const isSpecialCard = regalId === 'BEZ_REGALU'; // Czy to karta dla slotów "bez regału".
+
+            // Sprawdź, czy regał ma jakiekolwiek widoczne sloty (na podstawie zebranego licznika).
+            const hasVisibleSlots = regalId && visibleSlotsInRegal.hasOwnProperty(regalId) && visibleSlotsInRegal[regalId] > 0;
+
+            // Określ, czy karta regału powinna być widoczna.
+            let showCard = hasVisibleSlots;
+
+            // Specjalna obsługa dla karty "BEZ_REGALU":
+            // Powinna być widoczna, jeśli ma widoczne sloty LUB jeśli nie ma widocznych slotów,
+            // ale filtr statusu to 'error' lub 'all' I nie ma filtra tekstowego,
+            // ORAZ (dodatkowo) jeśli w ogóle są jakieś sloty w tej sekcji 'BEZ_REGALU'.
+            // Ta ostatnia część (`card.querySelectorAll('.tn-location-slot').length > 0`) zapewnia,
+            // że karta "BEZ_REGALU" nie pojawi się, jeśli w ogóle nie ma slotów bez przypisanego regału.
+             if (isSpecialCard && !hasVisibleSlots && (selectedStatus === 'error' || selectedStatus === 'all') && searchText === '') {
+                 // Sprawdź, czy w karcie "BEZ_REGALU" są w ogóle jakieś sloty.
+                 if (card.querySelectorAll('.tn-location-slot').length > 0) {
+                      showCard = true;
+                 }
+             }
+             // Dodatkowa poprawka: Karta "BEZ_REGALU" powinna być widoczna, jeśli ma jakiekolwiek sloty
+             // (nawet ukryte przez filtr), gdy filtr statusu to 'all' i nie ma filtra tekstowego.
+             // To pozwala zobaczyć sekcję, nawet jeśli wszystkie sloty są np. "zajęte" i filtr jest na "wolne".
+             // Lepsze podejście: karta regału powinna być widoczna, jeśli ma JAKIEKOLWIEK sloty,
+             // a logika ukrywania zależy tylko od tego, czy wewnątrz są widoczne sloty LUB czy jest to
+             // specjalny przypadek karty "BEZ_REGALU" z filtrem 'all'/'error' i pustym tekstem.
+             // Uproszczona logika: Karta regału jest widoczna, jeśli ma co najmniej jeden WIDOCZNY slot.
+             // Karta "BEZ_REGALU" jest wyjątkiem - jest widoczna, jeśli ma co najmniej jeden WIDOCZNY slot,
+             // LUB jeśli filtr statusu to 'all'/'error', brak filtra tekstowego i w ogóle są jakieś sloty w tej sekcji.
+             let finalShowCard = hasVisibleSlots;
+             if (isSpecialCard && (selectedStatus === 'error' || selectedStatus === 'all') && searchText === '') {
+                 if (card.querySelectorAll('.tn-location-slot').length > 0) {
+                      finalShowCard = true;
+                 }
+             }
+
+
+            // Pokaż lub ukryj kartę regału.
+            card.classList.toggle('tn-hidden', !finalShowCard);
+        });
+
+        log('Filtrowanie zakończone. Status:', selectedStatus, 'Tekst:', searchText);
+    };
+
+
+    // --- Obsługa Modala Powiększenia Zdjęcia ---
+    app.imageZoomModal = null; // Instancja modala.
+    // app.zoomedImageElement = null; // Element <img> w modalu (można pobrać w show.bs.modal).
+    // app.zoomedImageTitle = null; // Element tytułu w modalu (można pobrać w show.bs.modal).
+
+    app.initImageZoomModal = function() {
+        const element = document.getElementById('tnImageZoomModal'); // Element modala.
+        if (!element) return; // Jeśli element nie istnieje, przerwij inicjalizację.
+        log('Inicjalizacja Image Zoom Modal.');
+        // Pobierz lub utwórz instancję modala Bootstrapa.
+        this.imageZoomModal = bootstrap.Modal.getOrCreateInstance(element);
+
+        // Pobierz referencje do elementów wewnątrz modala (można też pobierać przy każdym otwarciu).
+        const zoomedImage = element.querySelector('#tnZoomedImage'); // Element <img> do wyświetlania powiększonego obrazka.
+        const modalTitle = element.querySelector('#tnImageZoomModalLabel'); // Element tytułu modala.
+
+        // Sprawdź, czy wszystkie wymagane elementy istnieją.
+        if (this.imageZoomModal && zoomedImage && modalTitle) {
+             // --- Event Listener: show.bs.modal ---
+             // Wywoływany tuż przed pokazaniem modala. Używany do ustawienia treści modala.
+             element.addEventListener('show.bs.modal', (event) => {
+                // relatedTarget to element, który wywołał modal (np. kliknięty link/przycisk).
+                const triggerElement = event.relatedTarget;
+                // Pobierz URL obrazka z atrybutu data-image-src elementu wywołującego lub z jego src.
+                const imageSource = triggerElement ? (triggerElement.getAttribute('data-image-src') || triggerElement.src) : null;
+                // Pobierz tytuł obrazka z atrybutu data-image-title, alt lub ustaw domyślny.
+                const imageTitle = triggerElement ? (triggerElement.getAttribute('data-image-title') || triggerElement.alt || 'Podgląd Zdjęcia') : 'Podgląd Zdjęcia';
+
+                // Ustaw źródło obrazka i tekst tytułu w elementach modala.
+                if (zoomedImage && imageSource) {
+                    zoomedImage.src = imageSource;
+                     // Opcjonalnie: ustaw atrybut alt na obrazku w modalu dla dostępności.
+                     zoomedImage.alt = imageTitle || 'Powiększone zdjęcie produktu';
+                } else if (zoomedImage) {
+                    // Jeśli brak źródła, wyczyść obrazek.
+                    zoomedImage.src = '';
+                    zoomedImage.alt = '';
+                }
+
+                if (modalTitle && imageTitle) {
+                    modalTitle.textContent = imageTitle;
+                } else if (modalTitle) {
+                     modalTitle.textContent = 'Podgląd Zdjęcia'; // Domyślny tytuł.
+                }
+
+                log('Pokazywanie modala obrazka:', imageSource);
+            });
+
+             // --- Event Listener: hidden.bs.modal ---
+             // Wywoływany po pełnym ukryciu modala. Używany do czyszczenia treści.
+             element.addEventListener('hidden.bs.modal', () => {
+                 // Wyczyść źródło obrazka i tytuł po zamknięciu modala.
+                 if (zoomedImage) {
+                     zoomedImage.src = '';
+                     zoomedImage.alt = '';
+                 }
+                 if (modalTitle) {
+                     modalTitle.textContent = 'Podgląd Zdjęcia';
+                 }
+                 log('Modal obrazka ukryty.');
+             });
+        } else {
+             console.warn("TN_LOG: Nie znaleziono wszystkich wymaganych elementów dla Image Zoom Modal (#tnZoomedImage, #tnImageZoomModalLabel).");
+        }
+    };
+
+     /**
+      * Funkcja publiczna do otwierania modala powiększenia obrazka.
+      * Może być wywołana bezpośrednio z kodu HTML (np. onclick) lub z innych funkcji JS.
+      * @param {string} imageUrl URL obrazka do wyświetlenia.
+      * @param {string} [imageTitle='Podgląd Zdjęcia'] Tytuł modala.
+      */
+     app.showImageModal = function(imageUrl, imageTitle = 'Podgląd Zdjęcia') { // Funkcja wywoływana np. z HTML lub z innych funkcji JS.
+        log('Wywołanie showImageModal z URL:', imageUrl);
+        const modalElement = document.getElementById('tnImageZoomModal');
+        if (!modalElement) {
+            console.error("TN_LOG: Element #tnImageZoomModal nie znaleziony. Nie można pokazać modala obrazka.");
+             if(typeof app.showFlashMessage === 'function') app.showFlashMessage("Błąd: Nie znaleziono elementu modala obrazka.", "danger");
+            return;
+        }
+        if (!imageUrl) {
+             console.warn("TN_LOG: Brak URL obrazka do pokazania w modalu.");
+             if(typeof app.showFlashMessage === 'function') app.showFlashMessage("Błąd: Brak adresu obrazka do wyświetlenia.", "warning");
+             return;
+        }
+
+        // Pobierz instancję modala.
+        const modal = this.imageZoomModal || bootstrap.Modal.getOrCreateInstance(modalElement);
+        if (!modal) {
+             console.error("TN_LOG: Nie można uzyskać instancji modala obrazka.");
+              if(typeof app.showFlashMessage === 'function') app.showFlashMessage("Błąd: Nie można zainicjalizować modala obrazka.", "danger");
+             return;
+        }
+
+        // Pobierz elementy obrazka i tytułu w modalu.
+        const zoomedImage = modalElement.querySelector('#tnZoomedImage');
+        const modalTitle = modalElement.querySelector('#tnImageZoomModalLabel');
+
+        // Ustaw źródło obrazka i tytuł, jeśli elementy istnieją.
+        if(zoomedImage && modalTitle) {
+            zoomedImage.src = imageUrl;
+            zoomedImage.alt = imageTitle; // Ustaw alt dla dostępności.
+            modalTitle.textContent = imageTitle;
+            modal.show(); // Pokaż modal.
+        } else {
+             console.error("TN_LOG: Brak elementów #tnZoomedImage lub #tnImageZoomModalLabel w modalu obrazka.");
+             if(typeof app.showFlashMessage === 'function') app.showFlashMessage("Błąd: Wewnętrzny błąd modala obrazka.", "danger");
+        }
+     };
+
+
+    // --- NOWE: Obsługa Modala Kurierów (Dodawanie/Edycja) ---
+     app.courierModal = null; // Zmienna do przechowywania instancji modala Bootstrap.
+
+     app.initCourierModal = function() {
+        const element = document.getElementById('courierModal'); // Element modala.
+        if (!element) return; // Jeśli element nie istnieje, przerwij inicjalizację.
+        log('Inicjalizacja Courier Modal.');
+        // Pobierz lub utwórz instancję modala Bootstrapa.
+        this.courierModal = bootstrap.Modal.getOrCreateInstance(element);
+
+        // Tutaj można dodać globalne listenery dla tego modala, jeśli są potrzebne (np. resetowanie formularza przy ukryciu).
+         element.addEventListener('hidden.bs.modal', () => {
+             const form = element.querySelector('#courierForm');
+             if (form) {
+                 form.reset(); // Resetuj formularz po zamknięciu modala.
+                 form.classList.remove('was-validated'); // Usuń klasy walidacji.
+             }
+              const idInput = element.querySelector('#courierId');
+              if(idInput) idInput.value = ''; // Upewnij się, że ukryte ID jest czyszczone.
+             log('Courier Modal ukryty, formularz zresetowany.');
+         });
+
+          element.addEventListener('show.bs.modal', () => {
+              const form = element.querySelector('#courierForm');
+              if (form) {
+                  form.classList.remove('was-validated'); // Usuń klasy walidacji przed pokazaniem.
+              }
+          });
+     };
+
+     /**
+      * Otwiera modal kuriera w trybie dodawania lub edycji.
+      * Ta funkcja powinna być wywoływana np. po kliknięciu przycisku "Dodaj Kuriera" lub "Edytuj" w liście kurierów.
+      * @param {object|null} courier Obiekt zawierający dane kuriera do edycji (jeśli null, modal otworzy się w trybie dodawania).
+      */
+     app.openCourierModal = function(courier = null) {
+         log('Otwieranie modala kuriera', courier);
+         const modalElement = document.getElementById('courierModal');
+         if (!modalElement) {
+             console.error("TN_LOG: Nie znaleziono elementu #courierModal.");
+             if(typeof app.showFlashMessage === 'function') app.showFlashMessage("Błąd: Nie znaleziono elementu modala kuriera.", "danger");
+             return;
+         }
+         // Pobierz instancję modala.
+         const modal = this.courierModal || bootstrap.Modal.getOrCreateInstance(modalElement);
+         if (!modal) {
+             console.error("TN_LOG: Nie można uzyskać instancji modala kuriera.");
+             if(typeof app.showFlashMessage === 'function') app.showFlashMessage("Błąd: Nie można zainicjalizować modala kuriera.", "danger");
+             return;
+         }
+
+         // Pobierz referencje do elementów formularza.
+         const form = document.getElementById('courierForm');
+         const modalLabel = document.getElementById('courierModalLabel');
+         const idInput = document.getElementById('courierId'); // Ukryte pole na ID kuriera.
+         const nameInput = document.getElementById('courierName');
+         const prefixInput = document.getElementById('courierTrackingPattern'); // Pole na wzorzec URL śledzenia.
+         const notesInput = document.getElementById('courierNotes'); // Pole na notatki.
+         const activeInput = document.getElementById('courierIsActive'); // Checkbox statusu aktywności.
+
+         // Sprawdź, czy wszystkie wymagane elementy formularza istnieją.
+         if (!form || !modalLabel || !idInput || !nameInput || !prefixInput || !notesInput || !activeInput) {
+             console.error("TN_LOG: Brak wymaganych elementów formularza w modalu kuriera.");
+             if(typeof app.showFlashMessage === 'function') app.showFlashMessage("Błąd: Wewnętrzny błąd formularza kuriera.", "danger");
+             return;
+         }
+
+         form.classList.remove('was-validated'); // Resetuj klasy walidacji wizualnej Bootstrapa.
+         form.reset(); // Zawsze resetuj formularz przed wypełnieniem/otwarciem.
+
+         if (courier && typeof courier === 'object' && courier.id) { // Tryb edycji kuriera.
+             modalLabel.innerHTML = '<i class="bi bi-pencil-fill me-2"></i> Edytuj Kuriera'; // Ustaw tytuł modala.
+             // Wypełnij pola formularza danymi z obiektu 'courier'.
+             idInput.value = courier.id; // Ustaw ukryte pole ID.
+             nameInput.value = courier.name || '';
+             prefixInput.value = courier.tracking_url_prefix || '';
+             notesInput.value = courier.notes || '';
+             // Ustaw stan checkboxa aktywności. Sprawdź różne możliwe wartości (boolean true, string '1', number 1).
+             activeInput.checked = (courier.is_active === true || courier.is_active === '1' || courier.is_active === 1);
+         } else { // Tryb dodawania nowego kuriera.
+             modalLabel.innerHTML = '<i class="bi bi-plus-circle me-2"></i> Dodaj Nowego Kuriera'; // Ustaw tytuł modala.
+             // Pola zostaną wyczyszczone przez form.reset().
+             idInput.value = ''; // Upewnij się, że ukryte ID jest puste.
+             activeInput.checked = true; // Domyślnie nowy kurier jest aktywny.
+         }
+         modal.show(); // Pokaż modal.
+     };
+
+    // --- NOWE: Obsługa Modala Regałów (Dodawanie/Edycja) ---
+     app.regalModal = null; // Zmienna do przechowywania instancji modala Bootstrap.
+
+     app.initRegalModal = function() {
+        const element = document.getElementById('regalModal'); // Element modala.
+        if (!element) return; // Jeśli element nie istnieje, przerwij inicjalizację.
+        log('Inicjalizacja Regal Modal.');
+        // Pobierz lub utwórz instancję modala Bootstrapa.
+        this.regalModal = bootstrap.Modal.getOrCreateInstance(element);
+
+        // Tutaj można dodać globalne listenery dla tego modala, jeśli są potrzebne (np. resetowanie formularza przy ukryciu).
+         element.addEventListener('hidden.bs.modal', () => {
+             const form = element.querySelector('#regalForm');
+             if (form) {
+                 form.reset(); // Resetuj formularz po zamknięciu modala.
+                 form.classList.remove('was-validated'); // Usuń klasy walidacji.
+             }
+             // Upewnij się, że pola ID i oryginalnego ID są czyszczone i przywracane do stanu edytowalnego.
+             const idInput = element.querySelector('#regalIdInput');
+             const originalIdInput = element.querySelector('#originalRegalId');
+             const idHelp = element.querySelector('#regalIdHelp');
+             if(idInput) {
+                 idInput.value = '';
+                 idInput.readOnly = false;
+                 idInput.classList.remove('form-control-plaintext');
+                 idInput.classList.add('form-control');
+             }
+              if(originalIdInput) originalIdInput.value = '';
+              if(idHelp) idHelp.textContent = 'Unikalny identyfikator (np. R01).'; // Przywróć domyślny tekst pomocy.
+
+             log('Regal Modal ukryty, formularz zresetowany.');
+         });
+
+         element.addEventListener('show.bs.modal', () => {
+              const form = element.querySelector('#regalForm');
+              if (form) {
+                  form.classList.remove('was-validated'); // Usuń klasy walidacji przed pokazaniem.
+              }
+         });
+     };
+
+     /**
+      * Otwiera modal regału w trybie dodawania lub edycji.
+      * Ta funkcja powinna być wywoływana np. po kliknięciu przycisku "Dodaj Regał" lub "Edytuj" w liście regałów.
+      * @param {object|null} regalData Obiekt zawierający dane regału do edycji (jeśli null, modal otworzy się w trybie dodawania).
+      */
+     app.openRegalModal = function(regalData = null) {
+         log('Otwieranie modala regału', regalData);
+         const modalElement = document.getElementById('regalModal');
+         if (!modalElement) {
+             console.error("TN_LOG: Nie znaleziono elementu #regalModal.");
+             if(typeof app.showFlashMessage === 'function') app.showFlashMessage("Błąd: Nie znaleziono elementu modala regału.", "danger");
+             return;
+         }
+         // Pobierz instancję modala.
+         const modal = this.regalModal || bootstrap.Modal.getOrCreateInstance(modalElement);
+          if (!modal) {
+              console.error("TN_LOG: Nie można uzyskać instancji modala regału.");
+              if(typeof app.showFlashMessage === 'function') app.showFlashMessage("Błąd: Nie można zainicjalizować modala regału.", "danger");
+              return;
+          }
+
+         // Pobierz referencje do elementów formularza.
+         const form = document.getElementById('regalForm');
+         const modalLabel = document.getElementById('regalModalLabel');
+         const idInput = document.getElementById('regalIdInput'); // Pole input ID regału.
+         const descInput = document.getElementById('regalDescInput'); // Pole input opisu regału.
+         const originalIdInput = document.getElementById('originalRegalId'); // Ukryte pole na oryginalne ID przy edycji.
+         const idHelp = document.getElementById('regalIdHelp'); // Element z tekstem pomocy dla pola ID.
+
+         // Sprawdź, czy wszystkie wymagane elementy formularza istnieją.
+         if (!form || !modalLabel || !idInput || !descInput || !originalIdInput || !idHelp) {
+              console.error("TN_LOG: Brak wymaganych elementów formularza modala regału.");
+              if(typeof app.showFlashMessage === 'function') app.showFlashMessage("Błąd: Wewnętrzny błąd formularza regału.", "danger");
+              return;
+         }
+
+         form.classList.remove('was-validated'); // Resetuj klasy walidacji wizualnej.
+         form.reset(); // Zawsze resetuj formularz przed wypełnieniem/otwarciem.
+
+         if (regalData && typeof regalData === 'object' && regalData.tn_id_regalu) { // Tryb edycji regału.
+             modalLabel.innerHTML = '<i class="bi bi-pencil-fill me-2"></i> Edytuj Regał'; // Ustaw tytuł.
+             idInput.value = regalData.tn_id_regalu; // Wypełnij pole ID.
+             idInput.readOnly = true; // Ustaw pole ID jako tylko do odczytu.
+             idInput.classList.add('form-control-plaintext'); // Zmień styl na plain text.
+             idInput.classList.remove('form-control'); // Usuń standardowy styl.
+             idHelp.textContent = 'ID regału nie można zmienić.'; // Zmień tekst pomocy.
+             descInput.value = regalData.tn_opis_regalu || ''; // Wypełnij pole opisu.
+             originalIdInput.value = regalData.tn_id_regalu; // Zapisz oryginalne ID w ukrytym polu.
+         } else { // Tryb dodawania nowego regału.
+             modalLabel.innerHTML = '<i class="bi bi-plus-circle me-2"></i> Dodaj Regał'; // Ustaw tytuł.
+             // Pola zostaną wyczyszczone przez form.reset().
+             idInput.value = ''; // Upewnij się, że pole ID jest puste.
+             idInput.readOnly = false; // Ustaw pole ID jako edytowalne.
+             idInput.classList.remove('form-control-plaintext'); // Usuń styl plain text.
+             idInput.classList.add('form-control'); // Przywróć standardowy styl.
+             idHelp.textContent = 'Unikalny identyfikator (np. R01).'; // Przywróć domyślny tekst pomocy.
+             descInput.value = ''; // Upewnij się, że pole opisu jest puste.
+             originalIdInput.value = ''; // Upewnij się, że ukryte pole jest puste.
+         }
+         modal.show(); // Pokaż modal.
+     };
+
+     // --- Funkcja pomocnicza do generowania URL ---
+     // Może być przydatna w JS do tworzenia linków.
+     // Uwaga: Ta implementacja jest uproszczona i nie obsługuje parametrów w ścieżce URL
+     // tak jak wersja PHP (np. /produkt/123). Obsługuje tylko podstawowe ścieżki i parametry query string.
+     // Aby działała poprawnie, element <body> w pliku header.php powinien mieć atrybut
+     // data-base-url="<?php echo rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\'); ?>".
+     app.generujUrl = function(pageId, params = {}) {
+          // Pobierz bazowy URL aplikacji z data-atrybutu body lub użyj pustego stringa.
+          const base = document.body.getAttribute('data-base-url') || '';
+          // Mapa ID stron na ścieżki URL. Należy ją uzupełnić o wszystkie potrzebne strony.
+          const pageMap = {
+              'dashboard': '/',
+              'products': '/produkty',
+              'orders': '/zamowienia',
+              'warehouse_view': '/magazyn', // Dodano widok magazynu.
+              'settings': '/ustawienia', // Dodano ustawienia.
+              'couriers': '/kurierzy', // Dodano kurierów.
+              'regaly': '/regaly', // Dodano regały.
+              'login_page': '/logowanie'
+              // ... uzupełnij mapę o inne strony ...
+          };
+          // Określ ścieżkę na podstawie pageId. Jeśli nie ma w mapie, użyj pageId jako ścieżki.
+          let path = pageMap[pageId] || '/' + pageId;
+          // Zbuduj query string z parametrów (jeśli są).
+          let queryString = Object.keys(params).length > 0 ? '?' + new URLSearchParams(params).toString() : '';
+          // Zbuduj pełny URL. Obsłuż przypadek, gdy path to '/' (strona główna).
+          let url = base + (path === '/' ? (queryString ? '/index.php' + queryString : '/') : path + queryString);
+           // Usuń podwójne slashe, chyba że są częścią protokołu (np. http://).
+           return url.replace(/(?<!:)\/\/+/g, '/');
+     };
+
+     // Udostępnij funkcję generowania URL globalnie, jeśli jest potrzebna poza obiektem tnApp.
+     // window.tn_generuj_url = app.generujUrl; // Opcjonalnie, jeśli inne skrypty jej potrzebują.
+
+
+     // --- Globalna funkcja potwierdzająca usunięcie ---
+     // Prosta funkcja do wyświetlania okna dialogowego potwierdzenia.
+     // Może być wywołana z HTML (np. onclick="return tnPotwierdzUsuniecie('Czy na pewno usunąć produkt?');").
+     window.tnPotwierdzUsuniecie = function(wiadomosc = 'Czy na pewno chcesz to zrobić?') {
+         return confirm(wiadomosc); // Zwraca true jeśli użytkownik kliknie OK, false jeśli Anuluj.
+     };
+
+     // --- Funkcja do pokazywania komunikatów flash (dymków) ---
+     // Dodana jako metoda obiektu app, aby była spójna.
+     // Wymaga elementu .tn-flash-container w DOM.
+     // Jest to alternatywa/uzupełnienie dla komunikatów generowanych po stronie PHP.
+     /**
+      * Pokazuje komunikat typu 'flash' (dymek). Wymaga elementu .tn-flash-container w DOM.
+      * @param {string} message Wiadomość do wyświetlenia.
+      * @param {string} type Typ komunikatu (np. 'success', 'danger', 'warning', 'info'). Domyślnie 'info'.
+      */
+     app.showFlashMessage = function(message, type = 'info') {
+         const container = document.querySelector('.tn-flash-container');
+         if (!container) {
+             console.warn('TN_LOG: Brak elementu .tn-flash-container do wyświetlenia komunikatu flash.', message);
+             // Fallback do alert(), jeśli kontener nie istnieje.
+             alert(`${type.toUpperCase()}: ${message}`);
+             return;
+         }
+
+         // Utwórz nowy element alertu Bootstrapa.
+         const alertElement = document.createElement('div');
+         alertElement.classList.add('alert', `alert-${type}`, 'alert-dismissible', 'fade', 'show');
+         alertElement.setAttribute('role', 'alert');
+         alertElement.innerHTML = `
+             ${message}
+             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+         `;
+
+         // Dodaj alert do kontenera.
+         container.appendChild(alertElement);
+         log('Pokazano komunikat flash:', message, type);
+
+         // Automatyczne zamykanie alertu po pewnym czasie.
+         const alertInstance = bootstrap.Alert.getOrCreateInstance(alertElement);
+         setTimeout(() => {
+             if (alertInstance) {
+                 alertInstance.close();
+             }
+         }, 7000); // 7000 milisekund = 7 sekund.
+     };
+
+
+})(tnApp); // Wywołanie funkcji z obiektem tnApp, przypisując do niego zdefiniowane funkcje i zmienne.
+
+// --- Uruchomienie Głównej Inicjalizacji ---
+// Czekaj, aż cały dokument HTML zostanie w pełni załadowany i sparsowany.
+document.addEventListener('DOMContentLoaded', function() {
+    // Sprawdź, czy obiekt tnApp został poprawnie utworzony i czy ma funkcję init.
+    if (typeof tnApp !== 'undefined' && typeof tnApp.init === 'function') {
+         tnApp.init(); // Uruchom główną funkcję inicjalizującą aplikację.
+    } else {
+        // Loguj błąd, jeśli aplikacja nie może zostać zainicjalizowana.
+        console.error("TN_LOG: Nie można zainicjalizować aplikacji TN App JS! Obiekt tnApp lub funkcja init nie zostały znalezione.");
+    }
+
+    // --- Dodatkowe skrypty specyficzne dla widoków (np. widok produktu) ---
+    // Poniższy kod może być przeniesiony do osobnych plików JS dla konkretnych widoków,
+    // aby uniknąć ładowania niepotrzebnego kodu na każdej stronie.
+    // Pozostawiam go tutaj, aby pokazać, jak można by go zintegrować,
+    // ale idealnie byłoby, gdyby był w plikach typu 'product_view.js', 'warehouse_view.js' itp.
+
+    // --- Funkcja zmiany głównego obrazka produktu i aktualizacji linku do modala ---
+    // Używana w widoku szczegółów produktu, gdy są miniatury galerii.
+    // Ta funkcja jest globalna (przypisana do window), aby można ją było łatwo wywołać z HTML miniatur.
+    window.changeMainImage = function(thumbnailElement, newImageSrc, newAltText) {
+        const mainImage = document.getElementById('tnMainProductImage'); // Główny element <img> obrazka produktu.
+        const modalLink = mainImage ? mainImage.closest('a[data-bs-toggle="modal"][data-bs-target="#tnImageZoomModal"]') : null; // Link otwierający modal powiększenia.
+        const currentActiveThumb = document.querySelector('.tn-gallery-thumbnail.active'); // Aktualnie aktywna miniatura.
+
+        if (mainImage && modalLink) {
+            mainImage.src = newImageSrc; // Zmień źródło głównego obrazka.
+            mainImage.alt = newAltText; // Zmień tekst alternatywny głównego obrazka.
+
+            // Zaktualizuj atrybuty data na linku otwierającym modal, aby modal pokazał nowy obrazek.
+            modalLink.setAttribute('data-image-src', newImageSrc);
+            modalLink.setAttribute('data-image-title', newAltText);
+
+            // Zaktualizuj klasę 'active' dla miniatur: usuń z poprzedniej, dodaj do klikniętej.
+            if (currentActiveThumb) { currentActiveThumb.classList.remove('active'); }
+            if (thumbnailElement) { thumbnailElement.classList.add('active'); }
+             log('Zmieniono główny obrazek produktu na:', newImageSrc);
+        } else {
+             console.warn("TN_LOG: Nie znaleziono głównego obrazka produktu (#tnMainProductImage) lub linku modala powiększenia.");
+        }
+    };
+
+    // --- Obsługa Modala Powiększenia Obrazka (specyficzna dla widoku produktu) ---
+    // Ten listener jest specyficzny dla modala otwierającego się z linków/przycisków
+    // na stronie, które mają atrybuty data-bs-toggle i data-bs-target.
+    // Inicjalizacja instancji modala jest już w app.initImageZoomModal, ale ten listener
+    // obsługuje wypełnianie treści modala na podstawie elementu wywołującego.
+    const imageZoomModalElement = document.getElementById('tnImageZoomModal');
+    if (imageZoomModalElement) {
+        imageZoomModalElement.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget; // Element, który wywołał modal.
+            const imageSrc = button.getAttribute('data-image-src') || button.src; // Pobierz URL obrazka.
+            const imageTitle = button.getAttribute('data-image-title') || button.alt || 'Podgląd Zdjęcia'; // Pobierz tytuł.
+
+            const modalImage = imageZoomModalElement.querySelector('#tnZoomedImage'); // Element <img> w modalu.
+            const modalTitle = imageZoomModalElement.querySelector('#tnImageZoomModalLabel'); // Element tytułu w modalu.
+
+            if (modalImage && imageSrc) {
+                modalImage.src = imageSrc; // Ustaw źródło obrazka.
+                 modalImage.alt = imageTitle || 'Powiększone zdjęcie produktu'; // Ustaw alt.
+                 log('Modal powiększenia obrazka: Ustawiono src:', imageSrc);
+            } else if (modalImage) {
+                 modalImage.src = ''; modalImage.alt = '';
+                 log('Modal powiększenia obrazka: Brak src, wyczyszczono obrazek.');
+            }
+            if (modalTitle && imageTitle) {
+                modalTitle.textContent = imageTitle; // Ustaw tytuł.
+                 log('Modal powiększenia obrazka: Ustawiono tytuł:', imageTitle);
+            } else if (modalTitle) {
+                 modalTitle.textContent = 'Podgląd Zdjęcia';
+                 log('Modal powiększenia obrazka: Brak tytułu, ustawiono domyślny.');
+            }
+        });
+         imageZoomModalElement.addEventListener('hidden.bs.modal', () => {
+             // Wyczyść src i tytuł po zamknięciu modala.
+             const modalImage = imageZoomModalElement.querySelector('#tnZoomedImage');
+             const modalTitle = imageZoomModalElement.querySelector('#tnImageZoomModalLabel');
+             if (modalImage) { modalImage.src = ''; modalImage.alt = ''; }
+             if (modalTitle) { modalTitle.textContent = 'Podgląd Zdjęcia'; }
+             log('Modal powiększenia obrazka ukryty.');
+         });
+    } else {
+         console.warn("TN_LOG: Element #tnImageZoomModal nie znaleziony. Listener dla show.bs.modal nie został podpięty.");
+    }
+
+
+    // --- Obsługa Modala Powiększenia Kodu Kreskowego ---
+    const barcodeZoomModal = document.getElementById('tnBarcodeZoomModal');
+    if (barcodeZoomModal) {
+        barcodeZoomModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget; // Element, który wywołał modal.
+            const barcodeValue = button.getAttribute('data-barcode-value'); // Pobierz wartość kodu kreskowego z atrybutu data.
+
+            const modalBarcodeImage = barcodeZoomModal.querySelector('#barcode-modal-img'); // Element <img> na kod kreskowy.
+            const modalTitle = barcodeZoomModal.querySelector('.modal-title'); // Element tytułu modala.
+
+            if (modalBarcodeImage && barcodeValue) {
+                 // Ścieżka do skryptu PHP generującego kod kreskowy. Musi być zgodna ze ścieżką w PHP.
+                 // Parametry: f=format (svg), s=typ (ean-128), height/width, d=dane (wartość kodu kreskowego).
+                 // Użyj encodeURIComponent, aby poprawnie zakodować wartość kodu kreskowego w URL-u.
+                 const barcode_modal_url = `/kod_kreskowy.php?f=svg&s=ean-128&height=200&width=3&d=${encodeURIComponent(barcodeValue)}`;
+                 modalBarcodeImage.src = barcode_modal_url; // Ustaw źródło obrazka kodu kreskowego.
+                 log('Modal kodu kreskowego: Ustawiono src:', barcode_modal_url);
+            } else if (modalBarcodeImage) {
+                 modalBarcodeImage.src = '';
+                 log('Modal kodu kreskowego: Brak wartości, wyczyszczono obrazek.');
+            }
+             if (modalTitle && barcodeValue) {
+                 modalTitle.textContent = `Kod Kreskowy: ${barcodeValue}`; // Ustaw tytuł modala.
+                 log('Modal kodu kreskowego: Ustawiono tytuł:', `Kod Kreskowy: ${barcodeValue}`);
+             } else if (modalTitle) {
+                  modalTitle.textContent = 'Kod Kreskowy';
+                  log('Modal kodu kreskowego: Brak wartości, ustawiono domyślny.');
+             }
+        });
+         barcodeZoomModal.addEventListener('hidden.bs.modal', () => {
+             // Wyczyść src po zamknięciu modala.
+             const modalBarcodeImage = barcodeZoomModal.querySelector('#barcode-modal-img');
+             const modalTitle = barcodeZoomModal.querySelector('.modal-title');
+             if (modalBarcodeImage) modalBarcodeImage.src = '';
+             if (modalTitle) modalTitle.textContent = 'Kod Kreskowy';
+             log('Modal kodu kreskowego ukryty.');
+         });
+    } else {
+         console.warn("TN_LOG: Element #tnBarcodeZoomModal nie znaleziony. Listener dla show.bs.modal nie został podpięty.");
+    }
+
+
+     // --- Aktywacja pierwszej dostępnej zakładki Bootstrapa ---
+     // Jeśli na stronie jest element z ID 'tnProductTab' (np. w widoku produktu z zakładkami),
+     // a żadna zakładka nie ma klasy 'active', aktywuj pierwszą dostępną zakładkę.
+     const productTabElement = document.getElementById('tnProductTab');
+     if (productTabElement) {
+          // Sprawdź, czy istnieje już aktywna zakładka.
+          const firstActiveTab = productTabElement.querySelector('.nav-link.active');
+          if (!firstActiveTab) {
+              // Jeśli nie ma aktywnej, znajdź pierwszą dostępną zakładkę.
+              const firstAvailableTab = productTabElement.querySelector(".nav-link");
+              if (firstAvailableTab) {
+                  // Utwórz instancję zakładki Bootstrapa i pokaż ją.
+                  const tab = new bootstrap.Tab(firstAvailableTab);
+                  tab.show();
+                  log('Aktywowano pierwszą zakładkę w #tnProductTab.');
+              } else {
+                   log('Nie znaleziono żadnych zakładek (.nav-link) w #tnProductTab.');
+              }
+          } else {
+               log('Znaleziono już aktywną zakładkę w #tnProductTab.');
+          }
+     }
+
+
+}); // Koniec listenera DOMContentLoaded

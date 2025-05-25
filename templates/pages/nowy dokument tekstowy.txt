@@ -1,0 +1,10 @@
+<div class="mb-4 pb-2 text-center text-md-start">
+        <h5 class="h6 text-muted mb-2 fw-normal">Szybkie Akcje:</h5><hr>
+        <div class="d-flex gap-2 flex-wrap justify-content-center justify-content-md-start">
+            <button type="button" class="btn btn-primary btn-sm" onclick="if(typeof tnApp !== 'undefined' && typeof tnApp.openAddModal === 'function') tnApp.openAddModal(); else alert('Błąd JS: Funkcja openAddModal() niedostępna.');"><i class="bi bi-plus-circle me-1"></i>Dodaj Produkt</button>
+            <button type="button" class="btn btn-success btn-sm" onclick="if(typeof tnApp !== 'undefined' && typeof tnApp.setupOrderModal === 'function') tnApp.setupOrderModal(); else alert('Błąd JS: Funkcja setupOrderModal() niedostępna.');"><i class="bi bi-cart-plus me-1"></i>Dodaj Zamówienie</button>
+            <a href="<?php echo tn_generuj_url('return_form_new'); ?>" class="btn btn-warning btn-sm text-dark"><i class="bi bi-journal-plus me-1"></i>Dodaj Zwrot/Rekl.</a>
+            <a href="<?php echo tn_generuj_url('warehouse_view'); ?>" class="btn btn-info btn-sm"><i class="bi bi-grid-3x3-gap me-1"></i>Widok Magazynu</a>
+            <a href="<?php echo tn_generuj_url('settings'); ?>" class="btn btn-secondary btn-sm"><i class="bi bi-sliders me-1"></i>Ustawienia</a>
+        </div>
+    </div>

@@ -1,0 +1,36 @@
+[
+    {
+        "id": 2,
+        "type": "reklamacja",
+        "status": "Zaakceptowana",
+        "date_created": "2025-04-20T01:21:16+02:00",
+        "date_updated": "2025-05-24T09:26:34+02:00",
+        "order_id": 12,
+        "product_id": 31,
+        "quantity": 1,
+        "customer_name": "Ryszard zebrowski",
+        "customer_contact": "rys-zeb1024@wp.pl",
+        "reason": "Wymiana MC3250 na MC3010",
+        "notes": "",
+        "resolution": "Wymiana",
+        "returned_stock_added": true,
+        "refund_amount": null
+    },
+    {
+        "id": 1,
+        "type": "zwrot",
+        "status": "Zaakceptowana",
+        "date_created": "2025-04-19 09:43:24",
+        "date_updated": "2025-05-24T09:26:25+02:00",
+        "order_id": 17,
+        "product_id": 85,
+        "quantity": 1,
+        "customer_name": "Piotr Wciseł",
+        "customer_contact": "piotrwcisel@op.pl",
+        "reason": "Zwrot towaru",
+        "notes": "Dołączony formularz zwrotu towaru.\r\nZwrot wykonany: 8/05/2025 21:30",
+        "resolution": "Zwrot środków",
+        "returned_stock_added": true,
+        "refund_amount": null
+    }
+]

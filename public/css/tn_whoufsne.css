@@ -1,0 +1,167 @@
+
+/* Poprawki ogólne i Statystyki */
+.tn-statystyki-magazynu .progress { background-color: var(--bs-secondary-bg); }
+.tn-statystyki-magazynu .progress-bar { font-weight: 600; }
+
+/* Style Filtrów */
+.tn-warehouse-filters .form-label { margin-bottom: 0.2rem !important; }
+
+/* Style Regałów */
+.tn-regal-card { transition: opacity 0.3s ease-in-out, display 0s linear 0.3s; } /* Dodano transition dla display */
+.tn-regal-header { background-color: var(--bs-light-bg-subtle); border-bottom: 1px solid var(--bs-border-color-translucent); }
+.tn-regal-header h6 { font-size: 1rem; }
+.tn-regal-header .progress { height: 8px !important; background-color: var(--bs-secondary-bg); }
+.tn-regal-header .progress-bar { transition: width 0.5s ease-in-out; }
+[data-bs-theme="dark"] .tn-regal-header { background-color: var(--bs-gray-800); }
+.tn-regal-body { padding: 0; }
+.tn-level-block { border-top: 1px solid var(--bs-border-color-translucent); }
+.tn-regal-body > .tn-level-block:first-child { border-top: none; }
+.tn-level-header { padding: 0.4rem 1rem; background-color: var(--bs-tertiary-bg); border-bottom: 1px solid var(--bs-border-color-translucent); }
+[data-bs-theme="dark"] .tn-level-header { background-color: var(--bs-gray-700); }
+.tn-level-header span { font-size: 0.9em; }
+.tn-level-slots { padding: 0.75rem; display: flex; flex-wrap: wrap; /* Gap zarządzany przez klasy gęstości */ }
+
+/* Style Slotu Lokalizacji - Baza */
+.tn-location-slot {
+    border: 1px solid var(--bs-border-color);
+    border-left-width: 4px;
+    border-radius: var(--bs-border-radius);
+    position: relative;
+    background-color: var(--bs-body-bg);
+    display: flex; flex-direction: column; justify-content: space-between;
+    overflow: hidden;
+    transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out, opacity 0.3s ease-in-out, border-color 0.2s ease; /* Dodano border-color transition */
+    z-index: 1;
+}
+.tn-location-slot[data-bs-toggle="modal"] { cursor: pointer; }
+
+/* Podświetlanie powiązanych produktów (Nowe) */
+.tn-slot-related-highlight {
+    /* border-color: var(--bs-info) !important; */
+    box-shadow: 0 0 0 2px rgba(var(--bs-info-rgb), 0.5) !important; /* Używamy box-shadow zamiast border */
+    /* background-color: rgba(var(--bs-info-rgb), 0.1); */ /* Opcjonalne tło */
+    z-index: 5 !important; /* Na wierzch podświetlonych */
+}
+[data-bs-theme="dark"] .tn-slot-related-highlight {
+     box-shadow: 0 0 0 2px rgba(var(--bs-info-rgb), 0.7) !important;
+     /* background-color: rgba(var(--bs-info-rgb), 0.2); */
+}
+
+
+/* Ulepszony efekt hover */
+.tn-location-slot:hover {
+    box-shadow: 0 6px 18px rgba(var(--bs-black-rgb), .2);
+    border-color: var(--bs-primary);
+    z-index: 10 !important; /* Wyższy Z-index na hover */
+}
+/* Płynne przywracanie z-index */
+.tn-location-slot:not(:hover) { transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out, opacity 0.3s ease-in-out, border-color 0.2s ease, z-index 0s linear 0.25s; }
+
+/* Style statusów - drobne korekty tła */
+.tn-location-slot.status-occupied { border-left-color: var(--bs-primary); background-color: rgba(var(--bs-body-bg-rgb), 1); } /* Normalne tło */
+.tn-location-slot.status-occupied:hover { border-color: var(--bs-primary); background-color: rgba(var(--bs-body-bg-rgb), 1); }
+.tn-location-slot.status-empty { border-left-color: var(--bs-secondary); background-color: var(--bs-light-bg-subtle); }
+.tn-location-slot.status-empty:hover { border-color: var(--bs-secondary); background-color: var(--bs-light-bg); }
+.tn-location-slot.status-error { border-left-color: var(--bs-danger); background-color: rgba(var(--bs-danger-rgb), 0.05); cursor: help; }
+.tn-location-slot.status-error:hover { border-color: var(--bs-danger); background-color: rgba(var(--bs-danger-rgb), 0.1); }
+
+/* Elementy wewnątrz slotu */
+.tn-slot-header { margin-bottom: 0.4rem; padding-bottom: 0.3rem; border-bottom: 1px dashed var(--bs-border-color-translucent); }
+.tn-slot-id { font-weight: 600; color: var(--bs-emphasis-color); cursor: pointer; }
+.tn-slot-id:hover { color: var(--bs-primary); }
+.tn-slot-status-icon { font-size: 1em; }
+.tn-slot-content { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 0.3rem; }
+.tn-slot-product { line-height: 1.35; }
+.tn-slot-product-details { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } /* Zapobiega zawijaniu w małych slotach */
+.tn-slot-product .tn-product-link { color: var(--bs-link-color); font-weight: 500; }
+.tn-slot-product .tn-product-link:hover { text-decoration: underline; color: var(--bs-link-hover-color); }
+.tn-slot-product .badge { font-size: 0.75em; padding: 0.25em 0.45em; }
+.tn-slot-thumbnail-small { flex-shrink: 0; /* Zapobiega kurczeniu się miniaturki */ }
+.tn-slot-empty-text { font-style: italic; text-align: center; align-self: center; flex-grow: 1; display: flex; align-items: center; justify-content: center; height: 100%; min-height: 50px; }
+.tn-location-slot.status-empty:hover .tn-slot-empty-text { color: var(--bs-primary); }
+
+/* Kod kreskowy */
+.tn-slot-barcode { height: 50px; line-height: 50px; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--bs-border-color-translucent); cursor: pointer; }
+.tn-barcode-image { height: 45px; width: 100%; max-width: 180px; object-fit: contain; display: block; margin: 0 auto; }
+.tn-slot-barcode:hover .tn-barcode-image { filter: brightness(1.1); } /* Lekkie rozjaśnienie kodu na hover */
+
+/* Przyciski akcji w slocie */
+.tn-slot-actions { position: absolute; top: 4px; right: 5px; display: flex; gap: 3px; z-index: 5; opacity: 0; visibility: hidden; transition: opacity 0.2s ease, visibility 0.2s ease; }
+.tn-location-slot:hover .tn-slot-actions { opacity: 1; visibility: visible; }
+.tn-location-slot.status-empty .tn-slot-actions .tn-action-clear,
+.tn-location-slot.status-empty .tn-slot-actions .tn-action-quick-view,
+.tn-location-slot.status-error .tn-slot-actions { display: none; }
+.tn-slot-action-btn { padding: 0.15rem 0.35rem; font-size: 0.75em; line-height: 1; border-radius: 0.2rem; background-color: rgba(var(--bs-body-bg-rgb), 0.8); backdrop-filter: blur(2px); }
+.tn-slot-action-btn:hover { background-color: rgba(var(--bs-body-bg-rgb), 1); }
+
+/* Modal kodu kreskowego */
+#barcodeModalImage { background-color: white; /* Zapewnia białe tło dla kodu */ padding: 10px; border-radius: var(--bs-border-radius); }
+[data-bs-theme="dark"] #barcodeModalImage { background-color: white; /* Kod kreskowy zawsze na białym */ }
+
+/* Popover */
+.tn-warehouse-popover .popover-header { font-size: 0.9rem; font-weight: bold; }
+.tn-warehouse-popover .popover-body { font-size: 0.85rem; padding: 0.5rem 0.75rem; }
+
+/* Kontrola Gęstości (Nowe Style) */
+.tn-level-slots { transition: gap 0.3s ease; } /* Płynna zmiana odstępów */
+
+/* Normalna (domyślna) */
+.warehouse-density-normal .tn-level-slots { gap: 0.6rem; }
+.warehouse-density-normal .tn-location-slot { padding: 0.5rem 0.75rem; min-width: 200px; flex-basis: 200px; min-height: 145px; font-size: 0.85rem; }
+.warehouse-density-normal .tn-slot-thumbnail-small { width: 40px; height: 40px; }
+.warehouse-density-normal .tn-slot-product { font-size: 0.9em; }
+.warehouse-density-normal .tn-barcode-image { height: 45px; }
+.warehouse-density-normal .tn-slot-barcode { height: 50px; line-height: 50px; }
+
+/* Kompaktowa */
+.warehouse-density-compact .tn-level-slots { gap: 0.3rem; }
+.warehouse-density-compact .tn-location-slot { padding: 0.3rem 0.5rem; min-width: 160px; flex-basis: 160px; min-height: 110px; font-size: 0.75rem; }
+.warehouse-density-compact .tn-slot-thumbnail-small { width: 30px; height: 30px; }
+.warehouse-density-compact .tn-slot-product { font-size: 0.8em; }
+.warehouse-density-compact .tn-slot-product .badge { font-size: 0.7em; padding: 0.2em 0.35em;}
+.warehouse-density-compact .tn-slot-barcode { height: 35px; line-height: 35px; margin-top: 0.3rem; padding-top: 0.3rem; }
+.warehouse-density-compact .tn-barcode-image { height: 30px; }
+.warehouse-density-compact .tn-slot-header { margin-bottom: 0.2rem; padding-bottom: 0.2rem; }
+.warehouse-density-compact .tn-slot-content { padding-top: 0.1rem; }
+.warehouse-density-compact .tn-slot-empty-text { font-size: 0.8em; min-height: 40px; }
+.warehouse-density-compact .tn-slot-action-btn { font-size: 0.7em; padding: 0.1rem 0.25rem;}
+
+/* Duża */
+.warehouse-density-large .tn-level-slots { gap: 0.8rem; }
+.warehouse-density-large .tn-location-slot { padding: 0.7rem 1rem; min-width: 240px; flex-basis: 240px; min-height: 170px; font-size: 0.9rem; }
+.warehouse-density-large .tn-slot-thumbnail-small { width: 50px; height: 50px; }
+.warehouse-density-large .tn-slot-product { font-size: 1em; }
+.warehouse-density-large .tn-slot-product .badge { font-size: 0.8em; }
+.warehouse-density-large .tn-barcode-image { height: 55px; }
+.warehouse-density-large .tn-slot-barcode { height: 60px; line-height: 60px; }
+.warehouse-density-large .tn-slot-header { margin-bottom: 0.5rem; padding-bottom: 0.4rem; }
+.warehouse-density-large .tn-slot-content { padding-top: 0.4rem; }
+.warehouse-density-large .tn-slot-empty-text { font-size: 1em; min-height: 60px; }
+
+
+/* Ciemny motyw - dostosowania */
+[data-bs-theme="dark"] .tn-regal-header { background-color: var(--bs-gray-800); }
+[data-bs-theme="dark"] .tn-level-header { background-color: var(--bs-gray-700); }
+[data-bs-theme="dark"] .tn-location-slot { background-color: var(--bs-gray-850); border-color: var(--bs-gray-700); } /* Lekko ciemniejsze tło slotu */
+[data-bs-theme="dark"] .tn-location-slot:hover { background-color: var(--bs-gray-750); border-color: var(--bs-primary); } /* Ciemniejsze tło hover */
+
+[data-bs-theme="dark"] .tn-location-slot.status-occupied { background-color: var(--bs-gray-850); border-left-color: var(--bs-primary); }
+[data-bs-theme="dark"] .tn-location-slot.status-occupied:hover { background-color: var(--bs-gray-750); border-color: var(--bs-primary); }
+[data-bs-theme="dark"] .tn-location-slot.status-empty { background-color: var(--bs-gray-800); border-left-color: var(--bs-secondary); }
+[data-bs-theme="dark"] .tn-location-slot.status-empty:hover { background-color: var(--bs-gray-700); border-color: var(--bs-secondary); }
+[data-bs-theme="dark"] .tn-location-slot.status-error { background-color: rgba(var(--bs-danger-rgb), 0.1); border-left-color: var(--bs-danger); }
+[data-bs-theme="dark"] .tn-location-slot.status-error:hover { background-color: rgba(var(--bs-danger-rgb), 0.15); border-color: var(--bs-danger); }
+
+[data-bs-theme="dark"] .tn-slot-id { color: var(--bs-body-color); }
+[data-bs-theme="dark"] .tn-slot-product { color: var(--bs-body-color); }
+[data-bs-theme="dark"] .tn-slot-empty-text { color: var(--bs-secondary-color); }
+[data-bs-theme="dark"] .tn-slot-thumbnail-small, [data-bs-theme="dark"] .tn-slot-thumbnail-small.tn-slot-thumbnail-placeholder { background-color: var(--bs-gray-700); border-color: var(--bs-gray-600); }
+[data-bs-theme="dark"] .tn-slot-thumbnail-small.tn-slot-thumbnail-placeholder i { color: var(--bs-gray-500); }
+[data-bs-theme="dark"] .tn-barcode-image { filter: invert(0.9) hue-rotate(180deg); }
+[data-bs-theme="dark"] .tn-slot-action-btn { background-color: rgba(var(--bs-dark-rgb), 0.8); }
+[data-bs-theme="dark"] .tn-slot-action-btn:hover { background-color: rgba(var(--bs-dark-rgb), 1); }
+[data-bs-theme="dark"] .tn-warehouse-popover { --bs-popover-bg: var(--bs-gray-700); --bs-popover-border-color: var(--bs-gray-600); --bs-popover-header-bg: var(--bs-gray-600); --bs-popover-header-color: var(--bs-light); --bs-popover-body-color: var(--bs-light); }
+[data-bs-theme="dark"] #barcodeModal .modal-content { background-color: var(--bs-dark); color: var(--bs-light); }
+[data-bs-theme="dark"] #barcodeModal .modal-header { border-bottom-color: var(--bs-gray-700); }
+[data-bs-theme="dark"] #barcodeModal .modal-footer { border-top-color: var(--bs-gray-700); }
+

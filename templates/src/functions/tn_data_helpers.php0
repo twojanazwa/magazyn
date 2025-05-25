@@ -1,0 +1,313 @@
+<?php
+// Plik: src/functions/tn_data_helpers.php
+// Opis: Funkcje pomocnicze do odczytu i zapisu danych z plików JSON
+// z uwzględnieniem blokowania plików (file locking).
+
+declare(strict_types=1);
+
+// Założenie: TN_SCIEZKA_DANE i nazwy plików JSON są zdefiniowane w tn_config.php
+// Jeśli TN_SCIEZKA_DANE nie jest zdefiniowane, użyj awaryjnej ścieżki (dostosuj w razie potrzeby)
+if (!defined('TN_SCIEZKA_DANE')) {
+     // Awaryjna definicja, jeśli tn_config.php jej nie dostarcza
+     // Przykładowa ścieżka: katalog_glowny_aplikacji/data/
+     define('TN_SCIEZKA_DANE', dirname(__DIR__, 2) . '/TNbazaDanych/');
+}
+
+// --- Definicje nazw plików JSON (powinny pochodzić z tn_config.php) ---
+// Dodaj definicje dla wszystkich używanych plików, jeśli nie ma ich w tn_config.php
+if (!defined('TN_PLIK_PRODUKTY')) define('TN_PLIK_PRODUKTY', TN_SCIEZKA_DANE . 'products.json');
+if (!defined('TN_PLIK_ZAMOWIENIA')) define('TN_PLIK_ZAMOWIENIA', TN_SCIEZKA_DANE . 'orders.json');
+if (!defined('TN_PLIK_ZWROTY')) define('TN_PLIK_ZWROTY', TN_SCIEZKA_DANE . 'returns.json');
+if (!defined('TN_PLIK_MAGAZYN')) define('TN_PLIK_MAGAZYN', TN_SCIEZKA_DANE . 'warehouse.json');
+if (!defined('TN_PLIK_REGALY')) define('TN_PLIK_REGALY', TN_SCIEZKA_DANE . 'regaly.json');
+if (!defined('TN_PLIK_USTAWIENIA')) define('TN_PLIK_USTAWIENIA', TN_SCIEZKA_DANE . 'settings.json');
+// if (!defined('TN_PLIK_KURSY_WALUT')) define('TN_PLIK_KURSY_WALUT', TN_SCIEZKA_DANE . 'currency_rates.json'); // Przykładowy dodatkowy plik
+
+
+/**
+ * Odczytuje dane z pliku JSON z blokadą.
+ *
+ * @param string $filename Pełna ścieżka do pliku JSON.
+ * @return array Tablica danych lub pusta tablica w przypadku błędu/braku pliku.
+ */
+function tn_read_json_file(string $filename): array
+{
+    // Sprawdź, czy plik istnieje
+    if (!file_exists($filename)) {
+        // Jeśli plik nie istnieje, zwróć pustą tablicę, bo często pętla po pustej tablicy jest oczekiwana
+        // error_log("tn_read_json_file WARNING: Plik nie istnieje: " . $filename);
+        return [];
+    }
+
+    $handle = fopen($filename, 'r');
+    if ($handle === false) {
+        error_log("tn_read_json_file ERROR: Nie udało się otworzyć pliku do odczytu: " . $filename);
+        return []; // Zwróć pustą tablicę w przypadku błędu otwarcia
+    }
+
+    $data = null;
+
+    // Uzyskaj współdzieloną blokadę do odczytu
+    // FLOCK_SH - Shared lock (for reading)
+    // FLOCK_EX - Exclusive lock (for writing)
+    // FLOCK_UN - Release a lock
+    // FLOCK_NB - Avoid blocking when locking (opcjonalnie)
+    if (flock($handle, FLOCK_SH)) {
+        $content = file_get_contents($filename, false, null, 0, filesize($filename)); // Odczytaj całą zawartość
+        if ($content !== false) {
+            $data = json_decode($content, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                error_log("tn_read_json_file ERROR: Błąd dekodowania JSON z pliku " . $filename . ": " . json_last_error_msg());
+                $data = []; // Zwróć pustą tablicę w przypadku błędu parsowania
+            }
+        } else {
+             error_log("tn_read_json_file ERROR: Nie udało się odczytać zawartości pliku: " . $filename);
+             $data = []; // Zwróć pustą tablicę w przypadku błędu odczytu zawartości
+        }
+
+        flock($handle, FLOCK_UN); // Zwolnij blokadę
+    } else {
+         // Jeśli nie udało się uzyskać blokady, spróbuj odczytać bez blokady (potencjalnie ryzykowne)
+         // Ale loguj ostrzeżenie
+         error_log("tn_read_json_file WARNING: Nie udało się uzyskać blokady odczytu dla pliku: " . $filename . ". Próba odczytu bez blokady.");
+         $content = @file_get_contents($filename); // @ - stłum błędy
+          if ($content !== false) {
+            $data = json_decode($content, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                 error_log("tn_read_json_file WARNING: Błąd dekodowania JSON po nieudanej blokadzie dla pliku " . $filename . ": " . json_last_error_msg());
+                 $data = [];
+            } else {
+                 // Sukces odczytu bez blokady
+            }
+         } else {
+             error_log("tn_read_json_file WARNING: Nie udało się odczytać zawartości pliku bez blokady: " . $filename);
+             $data = [];
+         }
+    }
+
+    fclose($handle);
+
+    // Zawsze zwróć tablicę, nawet jeśli dekodowanie zwróciło coś innego
+    return is_array($data) ? $data : [];
+}
+
+/**
+ * Zapisuje dane do pliku JSON z blokadą.
+ * Tworzy plik, jeśli nie istnieje.
+ *
+ * @param string $filename Pełna ścieżka do pliku JSON.
+ * @param array $data Tablica danych do zapisania.
+ * @return bool True w przypadku sukcesu, false w przypadku błędu.
+ */
+function tn_write_json_file(string $filename, array $data): bool
+{
+    $json_data = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    if ($json_data === false) {
+        error_log("tn_write_json_file ERROR: Błąd kodowania danych do JSON: " . json_last_error_msg());
+        return false;
+    }
+
+     // Upewnij się, że katalog istnieje
+    $dir = dirname($filename);
+    if (!is_dir($dir)) {
+        // Użyj try/catch do mkdir jeśli chcesz dokładniejszą obsługę błędów
+        if (!@mkdir($dir, 0775, true)) { // @ - stłum błędy, check returned value
+            error_log("tn_write_json_file ERROR: Nie udało się utworzyć katalogu: " . $dir);
+            return false;
+        }
+    }
+
+    // Otwórz plik w trybie zapisu/tworzenia, ustaw wskaźnik na początek, bez truncowania
+    // 'c+' - otwiera do odczytu i zapisu; jeśli plik nie istnieje, próbuje go utworzyć; nie truncuje
+    $handle = fopen($filename, 'c+');
+    if ($handle === false) {
+        error_log("tn_write_json_file ERROR: Nie udało się otworzyć pliku do zapisu: " . $filename);
+        return false;
+    }
+
+    $success = false;
+
+    // Uzyskaj wyłączną blokadę zapisu (blokującą)
+    if (flock($handle, FLOCK_EX)) {
+        // Truncate (skróć) plik do zera przed zapisem, aby usunąć starą zawartość
+        if (ftruncate($handle, 0)) {
+             // Ustaw wskaźnik na początek pliku (ftruncate często to robi, ale dla pewności)
+            rewind($handle);
+            // Zapisz dane
+            if (fwrite($handle, $json_data) !== false) {
+                 // Sprawdź czy zapisano całą zawartość
+                 if (strlen($json_data) === fwrite($handle, $json_data)) {
+                      $success = true;
+                 } else {
+                     error_log("tn_write_json_file ERROR: Nie zapisano całej zawartości do pliku: " . $filename);
+                 }
+            } else {
+                 error_log("tn_write_json_file ERROR: Błąd zapisu danych do pliku: " . $filename);
+            }
+        } else {
+            error_log("tn_write_json_file ERROR: Nie udało się skrócić pliku (ftruncate): " . $filename);
+        }
+
+        flock($handle, FLOCK_UN); // Zwolnij blokadę
+    } else {
+        error_log("tn_write_json_file ERROR: Nie udało się uzyskać blokady zapisu dla pliku: " . $filename);
+         // W przypadku braku blokady nie próbujemy zapisu bez blokady, bo jest to niebezpieczne
+    }
+
+    fclose($handle);
+
+    if (!$success) {
+        // Logowanie potencjalnych problemów po nieudanym zapisie
+        if (file_exists($filename)) {
+            // Można dodać bardziej zaawansowane sprawdzanie, np. czy plik jest pusty
+            error_log("tn_write_json_file WARNING: Zapis do pliku " . $filename . " nie powiódł się. Plik może być uszkodzony.");
+        }
+    }
+
+    return $success;
+}
+
+// --- Funkcje do ładowania konkretnych danych (używają tn_read_json_file) ---
+
+/**
+ * Ładuje dane produktów.
+ * @param string $filename Pełna ścieżka do pliku produktów.
+ * @return array Tablica produktów lub pusta tablica w przypadku błędu/braku pliku.
+ */
+function tn_laduj_produkty(string $filename = TN_PLIK_PRODUKTY): array
+{
+    $data = tn_read_json_file($filename);
+    // Dodaj sortowanie lub inne przetwarzanie, jeśli potrzebne
+    // usort($data, fn($a, $b) => ($a['id'] ?? 0) <=> ($b['id'] ?? 0)); // Sortowanie po ID
+    return is_array($data) ? $data : []; // Zawsze zwróć tablicę
+}
+
+/**
+ * Zapisuje dane produktów.
+ * @param string $filename Pełna ścieżka do pliku produktów.
+ * @param array $data Tablica produktów do zapisania.
+ * @return bool True w przypadku sukcesu, false w przypadku błędu.
+ */
+function tn_zapisz_produkty(string $filename = TN_PLIK_PRODUKTY, array $data): bool
+{
+    // Można dodać walidację lub przetwarzanie danych przed zapisem
+    return tn_write_json_file($filename, $data);
+}
+
+
+/**
+ * Ładuje dane zamówień.
+ * @param string $filename Pełna ścieżka do pliku zamówień.
+ * @return array Tablica zamówień lub pusta tablica w przypadku błędu/braku pliku.
+ */
+function tn_laduj_zamowienia(string $filename = TN_PLIK_ZAMOWIENIA): array
+{
+     $data = tn_read_json_file($filename);
+     // usort($data, fn($a, $b) => strcasecmp($a['order_date'] ?? '', $b['order_date'] ?? '')); // Sortowanie np. po dacie
+    return is_array($data) ? $data : [];
+}
+
+/**
+ * Zapisuje dane zamówień.
+ * @param string $filename Pełna ścieżka do pliku zamówień.
+ * @param array $data Tablica zamówień do zapisania.
+ * @return bool True w przypadku sukcesu, false w przypadku błędu.
+ */
+function tn_zapisz_zamowienia(string $filename = TN_PLIK_ZAMOWIENIA, array $data): bool
+{
+    return tn_write_json_file($filename, $data);
+}
+
+
+/**
+ * Ładuje dane zwrotów/reklamacji.
+ * @param string $filename Pełna ścieżka do pliku zwrotów.
+ * @return array Tablica zwrotów lub pusta tablica w przypadku błędu/braku pliku.
+ */
+function tn_laduj_zwroty(string $filename = TN_PLIK_ZWROTY): array
+{
+     $data = tn_read_json_file($filename);
+     // usort($data, fn($a, $b) => strcasecmp($a['date_created'] ?? '', $b['date_created'] ?? '')); // Sortowanie np. po dacie
+    return is_array($data) ? $data : [];
+}
+
+/**
+ * Zapisuje dane zwrotów/reklamacji.
+ * @param string $filename Pełna ścieżka do pliku zwrotów.
+ * @param array $data Tablica zwrotów do zapisania.
+ * @return bool True w przypadku sukcesu, false w przypadku błędu.
+ */
+function tn_zapisz_zwroty(string $filename = TN_PLIK_ZWROTY, array $data): bool
+{
+    return tn_write_json_file($filename, $data);
+}
+
+
+/**
+ * Ładuje stan magazynu (lokalizacje).
+ * @param string $filename Pełna ścieżka do pliku stanu magazynu.
+ * @return array Tablica lokalizacji magazynowych lub pusta tablica w przypadku błędu/braku pliku.
+ */
+function tn_laduj_magazyn(string $filename = TN_PLIK_MAGAZYN): array
+{
+     $data = tn_read_json_file($filename);
+     // Sortuj lokalizacje po ID dla spójności, jeśli istnieją dane
+     if (!empty($data)) {
+          usort($data, fn($a, $b) => strnatcmp($a['id'] ?? '', $b['id'] ?? ''));
+     }
+    return is_array($data) ? $data : [];
+}
+
+/**
+ * Zapisuje stan magazynu (lokalizacje).
+ * @param string $filename Pełna ścieżka do pliku stanu magazynu.
+ * @param array $data Tablica lokalizacji magazynowych do zapisania.
+ * @return bool True w przypadku sukcesu, false w przypadku błędu.
+ */
+function tn_zapisz_magazyn(string $filename = TN_PLIK_MAGAZYN, array $data): bool
+{
+     // Można dodać walidację lub przetwarzanie danych przed zapisem
+     // Np. ponowne posortowanie przed zapisem dla porządku w pliku
+     if (!empty($data)) {
+          usort($data, fn($a, $b) => strnatcmp($a['id'] ?? '', $b['id'] ?? ''));
+     }
+    return tn_write_json_file($filename, $data);
+}
+
+
+/**
+ * Ładuje definicje regałów.
+ * @param string $filename Pełna ścieżka do pliku regałów.
+ * @return array Tablica regałów lub pusta tablica w przypadku błędu/braku pliku.
+ */
+function tn_laduj_regaly(string $filename = TN_PLIK_REGALY): array
+{
+    $data = tn_read_json_file($filename);
+     // Sortuj regały po ID dla spójności, jeśli istnieją dane
+     if (!empty($data)) {
+          // Sortowanie po kluczach (ID regału) za pomocą uksort może być lepsze, ale sortowanie po wartości ID też działa
+          // uksort($data, 'strnatcmp');
+           usort($data, fn($a, $b) => strnatcmp($a['tn_id_regalu'] ?? '', $b['tn_id_regalu'] ?? ''));
+     }
+    return is_array($data) ? $data : [];
+}
+
+/**
+ * Zapisuje definicje regałów.
+ * @param string $filename Pełna ścieżka do pliku regałów.
+ * @param array $data Tablica regałów do zapisania.
+ * @return bool True w przypadku sukcesu, false w przypadku błędu.
+ */
+function tn_zapisz_regaly(string $filename = TN_PLIK_REGALY, array $data): bool
+{
+     // Można dodać walidację lub przetwarzanie danych przed zapisem
+     // Np. ponowne posortowanie przed zapisem dla porządku w pliku
+      if (!empty($data)) {
+          usort($data, fn($a, $b) => strnatcmp($a['tn_id_regalu'] ?? '', $b['tn_id_regalu'] ?? ''));
+     }
+    return tn_write_json_file($filename, $data);
+}
+
+// Można dodać inne funkcje ładowania i zapisywania dla pozostałych plików danych (ustawienia, kurierzy, itp.)
+
+?>

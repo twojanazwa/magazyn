@@ -1,0 +1,126 @@
+{
+    "produkty_na_stronie": 15,
+    "zamowienia_na_stronie": 15,
+    "zwroty_na_stronie": 15,
+    "waluta": "PLN",
+    "domyslny_procent_rabatu": 35,
+    "tn_format_daty": "d.m.Y",
+    "tn_format_czasu": "H:i",
+    "firma": {
+        "tn_nazwa_firmy": "EMERC.PL",
+        "tn_email_kontaktowy": "czesci@tnapp.pl"
+    },
+    "nazwa_strony": "TNiMAG",
+    "logo_strony": "/TNimg/logo.png",
+    "tekst_stopki": "TNiMAG - Twoje centrum dowodzenia e-commerce i logistyką",
+    "linki_menu": [
+        {
+            "tytul": "Pulpit",
+            "url": "/",
+            "id": "dashboard",
+            "ikona": "bi-speedometer2",
+            "grupa": "Nawigacja"
+        },
+        {
+            "tytul": "Produkty",
+            "url": "/produkty",
+            "id": "products",
+            "ikona": "bi-boxes",
+            "grupa": "Magazyn"
+        },
+        {
+            "tytul": "Zamówienia",
+            "url": "/zamowienia",
+            "id": "orders",
+            "ikona": "bi-receipt",
+            "grupa": "Sprzedaż"
+        },
+        {
+            "tytul": "Zwroty",
+            "url": "/zwroty",
+            "id": "returns_list",
+            "ikona": "bi-arrow-return-left",
+            "grupa": "Sprzedaż"
+        },
+        {
+            "tytul": "Magazyn",
+            "url": "/magazyn",
+            "id": "warehouse_view",
+            "ikona": "bi-grid-3x3-gap",
+            "grupa": "Magazyn"
+        },
+        {
+            "tytul": "Ustawienia",
+            "url": "#",
+            "id": "setting",
+            "ikona": "bi-sliders",
+            "grupa": "System"
+        },
+        {
+            "tytul": "Mój Profil",
+            "url": "/profil",
+            "id": "profile",
+            "ikona": "bi-person-badge",
+            "grupa": "System"
+        },
+        {
+            "tytul": "Informacje",
+            "url": "/informacje",
+            "id": "info",
+            "ikona": "bi-info-circle",
+            "grupa": "System"
+        },
+        {
+            "tytul": "Pomoc",
+            "url": "/pomoc",
+            "id": "help",
+            "ikona": "bi-question-circle",
+            "grupa": "System"
+        }
+    ],
+    "wyglad": {
+        "tn_motyw": "ciemny",
+        "tn_kolor_sidebar": "ciemny",
+        "tn_tabela_paskowana": true,
+        "tn_tabela_krawedzie": false,
+        "tn_kolor_akcentu": "#c0c0c0",
+        "rozmiar_czcionki": "13px"
+    },
+    "kategorie_produktow": [
+        "Części samochodowe",
+        "Przepustnica powietrza",
+        "Przepływomierz powietrza",
+        "Sonda lambda",
+        "Multimedia fabryczne",
+        "Zestawy naprawcze",
+        "Emblematy",
+        "Części używane",
+        "Akcesoria i gadżety",
+        "Elektronika",
+        "Oleje",
+        "Komputery",
+        "Inne"
+    ],
+    "domyslny_magazyn": "RM01",
+    "tn_domyslny_status_zam": "W przygotowaniu",
+    "tn_prog_niskiego_stanu": 0,
+    "magazyn": {
+        "tn_prefix_poziom_domyslny": "S",
+        "tn_prefix_miejsca_domyslny": "P"
+    },
+    "zwroty_reklamacje": {
+        "domyslny_status": "Zakończona",
+        "statusy": [
+            "Nowe zgłoszenie",
+            "W trakcie rozpatrywania",
+            "Oczekuje na zwrot towaru",
+	"Zrealizowane",
+	"Zwrot przyjęty",
+	"Wymiana towaru",
+	"Reklamacja przyjęta",
+            "Zaakceptowana",
+            "Odrzucona",
+            "Zakończona"
+        ]
+    }
+}

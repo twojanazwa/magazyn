@@ -1,0 +1,504 @@
+/**
+ * Plik: public/js/tn_warehouse_view.js
+ * Opis: Skrypt JavaScript obsługujący interakcje na stronie widoku magazynu,
+ * w tym modale do przypisywania produktów, dodawania/edycji regałów
+ * oraz generowania lokalizacji.
+ * Wersja: 1.0 (Podstawowa struktura z komentarzami)
+ */
+
+// Utworzenie globalnego obiektu tnApp, jeśli jeszcze nie istnieje
+// Używamy go jako przestrzeni nazw, aby uniknąć kolizji zmiennych
+window.tnApp = window.tnApp || {};
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('tn_warehouse_view.js załadowany.');
+
+    // --- Obsługa modala Przypisywania Produktu (AssignWarehouseModal) ---
+    const assignWarehouseModal = document.getElementById('assignWarehouseModal');
+    const assignModalLocationIdSpan = document.getElementById('assignModalLocationId');
+    const productSearchInput = document.getElementById('productSearchInput');
+    const productSearchResultsDiv = document.getElementById('productSearchResults');
+    const productQuantityInput = document.getElementById('productQuantityInput');
+    const assignProductToLocationBtn = document.getElementById('assignProductToLocationBtn');
+
+    // Zmienna do przechowywania ID lokalizacji, do której przypisujemy produkt
+    let currentLocationIdForAssign = null;
+    // Zmienna do przechowywania ID wybranego produktu z wyszukiwarki
+    let selectedProductIdForAssign = null;
+
+    // Event listener na otwarcie modala przypisywania
+    assignWarehouseModal?.addEventListener('show.bs.modal', function (event) {
+        // Przycisk, który otworzył modal (to jest slot magazynowy)
+        const button = event.relatedTarget;
+        // Pobranie ID lokalizacji z atrybutu data-location-id klikniętego slotu
+        currentLocationIdForAssign = button?.getAttribute('data-location-id');
+
+        // Wyświetlenie ID lokalizacji w nagłówku modala
+        if (assignModalLocationIdSpan && currentLocationIdForAssign) {
+            assignModalLocationIdSpan.textContent = currentLocationIdForAssign;
+        }
+
+        // Resetowanie pól formularza i wyników wyszukiwania przy otwarciu
+        productSearchInput.value = '';
+        productSearchResultsDiv.innerHTML = '';
+        productQuantityInput.value = 1;
+        selectedProductIdForAssign = null; // Resetuj wybrany produkt
+        assignProductToLocationBtn.disabled = true; // Wyłącz przycisk przypisania na początku
+    });
+
+    // Event listener na zamknięcie modala przypisywania
+    assignWarehouseModal?.addEventListener('hidden.bs.modal', function () {
+        // Czyszczenie zmiennych po zamknięciu modala
+        currentLocationIdForAssign = null;
+        selectedProductIdForAssign = null;
+        assignProductToLocationBtn.disabled = true;
+    });
+
+    // Event listener na wpisywanie w pole wyszukiwania produktu
+    productSearchInput?.addEventListener('input', function() {
+        const query = this.value.trim();
+        if (query.length > 2) { // Zacznij wyszukiwać po wpisaniu co najmniej 3 znaków
+            // TODO: Zaimplementuj tutaj logikę wyszukiwania produktów.
+            //  Wykonaj zapytanie AJAX do skryptu PHP (np. tn_action_find_product_by_barcode.php lub innego)
+            //  przekazując frazę wyszukiwania.
+            //  Po otrzymaniu wyników, wyrenderuj je w productSearchResultsDiv.
+            console.log('Szukaj produktu:', query);
+            // Przykład: Wywołaj funkcję AJAX do wyszukiwania
+            // tnApp.searchProducts(query);
+        } else {
+            productSearchResultsDiv.innerHTML = ''; // Wyczyść wyniki, jeśli zapytanie jest za krótkie
+            selectedProductIdForAssign = null; // Resetuj wybrany produkt
+            assignProductToLocationBtn.disabled = true; // Wyłącz przycisk przypisania
+        }
+    });
+
+    // TODO: Zaimplementuj funkcję tnApp.searchProducts(query)
+    //  Ta funkcja powinna wysyłać zapytanie AJAX do serwera
+    //  i renderować wyniki w productSearchResultsDiv.
+    //  Dla każdego wyniku dodaj event listener, który po kliknięciu
+    //  ustawi selectedProductIdForAssign i włączy przycisk assignProductToLocationBtn.
+
+    // Przykład struktury wyniku wyszukiwania (do zaimplementowania w AJAX success):
+    /*
+    function displaySearchResults(results) {
+        productSearchResultsDiv.innerHTML = ''; // Wyczyść poprzednie wyniki
+        if (results.length > 0) {
+            results.forEach(product => {
+                const item = document.createElement('button');
+                item.classList.add('list-group-item', 'list-group-item-action');
+                item.textContent = `${product.name} (ID: ${product.id}, Nr kat.: ${product.catalog_nr})`;
+                item.setAttribute('data-product-id', product.id);
+                item.addEventListener('click', function() {
+                    selectedProductIdForAssign = this.getAttribute('data-product-id');
+                    productSearchInput.value = this.textContent; // Wstaw nazwę do pola wyszukiwania
+                    productSearchResultsDiv.innerHTML = ''; // Ukryj wyniki
+                    assignProductToLocationBtn.disabled = false; // Włącz przycisk przypisania
+                    console.log('Wybrano produkt ID:', selectedProductIdForAssign);
+                });
+                productSearchResultsDiv.appendChild(item);
+            });
+        } else {
+            productSearchResultsDiv.innerHTML = '<div class="list-group-item text-muted">Brak wyników</div>';
+            selectedProductIdForAssign = null;
+            assignProductToLocationBtn.disabled = true;
+        }
+    }
+    */
+
+
+    // Event listener na kliknięcie przycisku "Przypisz Produkt"
+    assignProductToLocationBtn?.addEventListener('click', function() {
+        const quantity = parseInt(productQuantityInput.value, 10);
+
+        if (currentLocationIdForAssign && selectedProductIdForAssign && quantity > 0) {
+            // TODO: Zaimplementuj tutaj logikę przypisania produktu do lokalizacji.
+            //  Wykonaj zapytanie AJAX (metodą POST) do skryptu PHP (np. tn_action_assign_warehouse.php).
+            //  Przekaż ID lokalizacji (currentLocationIdForAssign), ID produktu (selectedProductIdForAssign)
+            //  oraz ilość (quantity).
+            //  Po otrzymaniu odpowiedzi z serwera (sukces/błąd), zamknij modal i odśwież widok magazynu
+            //  lub zaktualizuj odpowiedni slot.
+            console.log('Przypisz produkt ID:', selectedProductIdForAssign, 'do lokalizacji:', currentLocationIdForAssign, 'w ilości:', quantity);
+
+            // Przykład: Wywołaj funkcję AJAX do przypisania
+            // tnApp.assignProduct(currentLocationIdForAssign, selectedProductIdForAssign, quantity);
+
+            // Tymczasowe zamknięcie modala (do zastąpienia po implementacji AJAX)
+            const modal = bootstrap.Modal.getInstance(assignWarehouseModal);
+            modal?.hide();
+
+        } else {
+            alert('Proszę wybrać produkt i podać poprawną ilość.');
+        }
+    });
+
+     // TODO: Zaimplementuj funkcję tnApp.assignProduct(locationId, productId, quantity)
+     //  Ta funkcja powinna wysyłać zapytanie AJAX POST do serwera
+     //  i obsługiwać odpowiedź (np. wyświetlić komunikat sukcesu/błędu i odświeżyć stronę/slot).
+
+
+    // --- Obsługa modala Dodawania/Edycji Regału (regalModal) ---
+    const regalModal = document.getElementById('regalModal');
+    const regalModalLabel = document.getElementById('regalModalLabel');
+    const regalForm = document.getElementById('regalForm');
+    const regalIdInput = document.getElementById('regalId');
+    const regalNazwaInput = document.getElementById('regalNazwa');
+    const regalOpisInput = document.getElementById('regalOpis');
+    const regalLiczbaPoziomowInput = document.getElementById('regalLiczbaPoziomow');
+    const regalLiczbaSlotowNaPoziomieInput = document.getElementById('regalLiczbaSlotowNaPoziomie');
+    const saveRegalBtn = document.getElementById('saveRegalBtn');
+
+    // Funkcja do otwierania modala regału (używana w onclick w PHP)
+    tnApp.openRegalModal = function(regalData = null) {
+        const modal = new bootstrap.Modal(regalModal);
+
+        if (regalData && regalData.tn_id_regalu) {
+            // Tryb edycji
+            regalModalLabel.textContent = 'Edytuj Regał: ' + regalData.tn_id_regalu;
+            regalIdInput.value = regalData.tn_id_regalu;
+            regalNazwaInput.value = regalData.tn_id_regalu;
+            regalNazwaInput.disabled = true; // ID regału nie powinno być zmieniane podczas edycji
+            regalOpisInput.value = regalData.tn_opis_regalu || '';
+            // Pola liczby poziomów/slotów mogą być nieistotne przy edycji istniejącego regału,
+            // ale można je wyświetlić lub ukryć w zależności od logiki aplikacji.
+            // Na razie ustawiamy je na wartości domyślne lub z danych, jeśli dostępne.
+             regalLiczbaPoziomowInput.value = regalData.tn_liczba_poziomow || 1; // Założenie: dodano te pola do danych regału
+             regalLiczbaSlotowNaPoziomieInput.value = regalData.tn_liczba_slotow_na_poziomie || 1; // Założenie: dodano te pola do danych regału
+
+        } else {
+            // Tryb dodawania
+            regalModalLabel.textContent = 'Dodaj Nowy Regał';
+            regalIdInput.value = '';
+            regalNazwaInput.value = '';
+            regalNazwaInput.disabled = false; // ID regału jest edytowalne przy dodawaniu
+            regalOpisInput.value = '';
+            regalLiczbaPoziomowInput.value = 1;
+            regalLiczbaSlotowNaPoziomieInput.value = 1;
+        }
+
+        modal.show();
+    };
+
+    // Event listener na kliknięcie przycisku "Zapisz Regał"
+    saveRegalBtn?.addEventListener('click', function() {
+        const regalId = regalIdInput.value.trim();
+        const regalNazwa = regalNazwaInput.value.trim(); // Jeśli edycja, to będzie to samo co regalId
+        const regalOpis = regalOpisInput.value.trim();
+        const liczbaPoziomow = parseInt(regalLiczbaPoziomowInput.value, 10);
+        const liczbaSlotow = parseInt(regalLiczbaSlotowNaPoziomieInput.value, 10);
+
+        if (regalNazwa && liczbaPoziomow > 0 && liczbaSlotow > 0) {
+             // TODO: Zaimplementuj tutaj logikę zapisu regału.
+             //  Wykonaj zapytanie AJAX (metodą POST) do skryptu PHP (np. tn_action_create_regal.php).
+             //  Przekaż dane regału: id (jeśli edycja), nazwa, opis, liczba poziomów, liczba slotów.
+             //  Pamiętaj, że przy edycji ID regału (regalId) jest kluczem.
+             //  Przy dodawaniu, regalNazwa to nowe ID.
+             //  Po otrzymaniu odpowiedzi z serwera, zamknij modal i odśwież widok magazynu.
+            console.log('Zapisz Regał:', {
+                id: regalId || regalNazwa, // Użyj istniejącego ID przy edycji, nowej nazwy przy dodawaniu
+                nazwa: regalNazwa,
+                opis: regalOpis,
+                poziomy: liczbaPoziomow,
+                slotyNaPoziomie: liczbaSlotow
+            });
+
+             // Przykład: Wywołaj funkcję AJAX do zapisu
+             // tnApp.saveRegal({ id: regalId || regalNazwa, nazwa: regalNazwa, opis: regalOpis, poziomy: liczbaPoziomow, slotyNaPoziomie: liczbaSlotow });
+
+             // Tymczasowe zamknięcie modala (do zastąpienia po implementacji AJAX)
+             const modal = bootstrap.Modal.getInstance(regalModal);
+             modal?.hide();
+
+        } else {
+            alert('Proszę wypełnić wymagane pola ID Regału, Liczba Poziomów i Liczba Slotów na Poziomie.');
+        }
+    });
+
+    // TODO: Zaimplementuj funkcję tnApp.saveRegal(regalData)
+    //  Ta funkcja powinna wysyłać zapytanie AJAX POST do serwera
+    //  i obsługiwać odpowiedź (np. wyświetlić komunikat sukcesu/błędu i odświeżyć stronę).
+
+
+    // --- Obsługa modala Generowania Lokalizacji (generateLocationsModal) ---
+    const generateLocationsModal = document.getElementById('generateLocationsModal');
+    const selectRegalToGenerate = document.getElementById('selectRegalToGenerate');
+    const confirmGenerateOverwrite = document.getElementById('confirmGenerateOverwrite');
+    const startGenerateLocationsBtn = document.getElementById('startGenerateLocationsBtn');
+
+    // Włączenie przycisku generowania tylko gdy checkbox jest zaznaczony
+    confirmGenerateOverwrite?.addEventListener('change', function() {
+        startGenerateLocationsBtn.disabled = !this.checked;
+    });
+
+    // Event listener na kliknięcie przycisku "Generuj Lokalizacje"
+    startGenerateLocationsBtn?.addEventListener('click', function() {
+        const selectedRegals = Array.from(selectRegalToGenerate.selectedOptions).map(option => option.value);
+
+        if (confirmGenerateOverwrite.checked) {
+            // TODO: Zaimplementuj tutaj logikę generowania lokalizacji.
+            //  Wykonaj zapytanie AJAX (metodą POST) do skryptu PHP (np. tn_action_generate_locations.php).
+            //  Przekaż listę wybranych ID regałów (selectedRegals). Jeśli lista jest pusta,
+            //  serwer powinien wygenerować lokalizacje dla wszystkich regałów.
+            //  Po otrzymaniu odpowiedzi z serwera, zamknij modal i odśwież widok magazynu.
+            console.log('Generuj lokalizacje dla regałów:', selectedRegals.length > 0 ? selectedRegals : 'wszystkich');
+
+            // Przykład: Wywołaj funkcję AJAX do generowania
+            // tnApp.generateLocations(selectedRegals);
+
+            // Tymczasowe zamknięcie modala (do zastąpienia po implementacji AJAX)
+             const modal = bootstrap.Modal.getInstance(generateLocationsModal);
+             modal?.hide();
+
+        } else {
+            alert('Proszę potwierdzić, że rozumiesz konsekwencje nadpisania danych.');
+        }
+    });
+
+    // TODO: Zaimplementuj funkcję tnApp.generateLocations(regalIds)
+    //  Ta funkcja powinna wysyłać zapytanie AJAX POST do serwera
+    //  i obsługiwać odpowiedź (np. wyświetlić komunikat sukcesu/błędu i odświeżyć stronę).
+
+
+    // --- Obsługa filtrów widoku ---
+    const filterRegalSelect = document.getElementById('tn_filter_regal');
+    const filterStatusSelect = document.getElementById('tn_filter_status');
+    const filterTextInput = document.getElementById('tn_filter_text');
+    const clearFiltersBtn = document.getElementById('tn_clear_filters_btn');
+    const noFilterResultsMessage = document.getElementById('noFilterResultsMessage');
+    const warehouseGridContainer = document.getElementById('warehouseGridContainer'); // Kontener główny siatki
+
+    // Funkcja do zastosowania filtrów
+    function applyFilters() {
+        const selectedRegal = filterRegalSelect.value;
+        const selectedStatus = filterStatusSelect.value;
+        const filterText = filterTextInput.value.toLowerCase().trim();
+
+        let visibleCount = 0;
+
+        // Iteracja przez wszystkie karty regałów
+        document.querySelectorAll('.tn-regal-card').forEach(regalCard => {
+            const regalId = regalCard.getAttribute('data-regal-id');
+            let regalCardVisible = false; // Czy karta regału powinna być widoczna
+
+            // Sprawdź filtr regału
+            const matchRegal = (selectedRegal === 'all' || regalId === selectedRegal);
+
+            // Iteracja przez wszystkie sloty w bieżącej karcie regału
+            regalCard.querySelectorAll('.tn-location-slot').forEach(slot => {
+                const slotStatus = slot.getAttribute('data-status');
+                const slotFilterText = slot.getAttribute('data-filter-text') || '';
+
+                // Sprawdź filtr statusu
+                const matchStatus = (selectedStatus === 'all' || slotStatus === selectedStatus);
+
+                // Sprawdź filtr tekstowy
+                const matchText = (filterText === '' || slotFilterText.includes(filterText));
+
+                // Slot jest widoczny, jeśli pasuje do wszystkich aktywnych filtrów
+                const slotVisible = matchRegal && matchStatus && matchText;
+
+                // Ustaw widoczność slotu
+                slot.style.display = slotVisible ? '' : 'none';
+
+                if (slotVisible) {
+                    regalCardVisible = true; // Jeśli choć jeden slot w regale jest widoczny, pokaż regał
+                    visibleCount++;
+                }
+            });
+
+            // Ustaw widoczność karty regału
+            // Karta regału jest widoczna, jeśli pasuje do filtra regału
+            // ORAZ jeśli zawiera jakiekolwiek widoczne sloty (po zastosowaniu filtrów statusu i tekstu)
+            regalCard.style.display = (matchRegal && regalCardVisible) ? '' : 'none';
+
+        });
+
+        // Pokaż/ukryj komunikat o braku wyników
+        if (visibleCount === 0) {
+            noFilterResultsMessage.classList.remove('d-none');
+        } else {
+            noFilterResultsMessage.classList.add('d-none');
+        }
+    }
+
+    // Event listeners na zmiany w filtrach
+    filterRegalSelect?.addEventListener('change', applyFilters);
+    filterStatusSelect?.addEventListener('change', applyFilters);
+    filterTextInput?.addEventListener('input', applyFilters);
+
+    // Event listener na przycisk "Wyczyść filtry"
+    clearFiltersBtn?.addEventListener('click', function() {
+        filterRegalSelect.value = 'all';
+        filterStatusSelect.value = 'all';
+        filterTextInput.value = '';
+        applyFilters(); // Zastosuj wyczyszczone filtry
+    });
+
+    // Zastosuj filtry przy ładowaniu strony (aby uwzględnić ewentualne filtry z URL lub domyślne)
+    applyFilters();
+
+
+    // --- Obsługa zmiany gęstości widoku ---
+    const densityRadios = document.querySelectorAll('input[name="density"]');
+
+    // Funkcja do ustawiania klasy gęstości
+    function setDensityClass(density) {
+        warehouseGridContainer.classList.remove('warehouse-density-compact', 'warehouse-density-normal', 'warehouse-density-large');
+        warehouseGridContainer.classList.add('warehouse-density-' + density);
+        // Opcjonalnie zapisz preferencję użytkownika w Local Storage
+        localStorage.setItem('warehouseViewDensity', density);
+    }
+
+    // Event listeners na przyciski gęstości
+    densityRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                setDensityClass(this.value);
+            }
+        });
+    });
+
+    // Wczytaj preferowaną gęstość z Local Storage przy ładowaniu strony
+    const savedDensity = localStorage.getItem('warehouseViewDensity');
+    if (savedDensity) {
+        const radioToSelect = document.getElementById('density' + savedDensity.charAt(0).toUpperCase() + savedDensity.slice(1));
+        if (radioToSelect) {
+            radioToSelect.checked = true;
+            setDensityClass(savedDensity);
+        } else {
+             // Jeśli zapisana wartość jest niepoprawna, ustaw domyślną (normal)
+             document.getElementById('densityNormal').checked = true;
+             setDensityClass('normal');
+        }
+    } else {
+        // Jeśli brak zapisanej preferencji, ustaw domyślną (normal)
+        document.getElementById('densityNormal').checked = true;
+        setDensityClass('normal');
+    }
+
+
+    // --- Obsługa powiększania kodu kreskowego lokalizacji ---
+    const barcodeModal = document.getElementById('barcodeModal');
+    const barcodeModalLocationIdSpan = document.getElementById('barcodeModalLocationId');
+    const barcodeModalImage = document.getElementById('barcodeModalImage');
+
+    // Event delegation dla kliknięć na kody kreskowe slotów
+    warehouseGridContainer?.addEventListener('click', function(event) {
+        const barcodeDiv = event.target.closest('.tn-slot-barcode');
+        if (barcodeDiv) {
+            const locationId = barcodeDiv.getAttribute('data-location-id');
+            const largeBarcodeSrc = barcodeDiv.getAttribute('data-barcode-src');
+
+            if (locationId && largeBarcodeSrc) {
+                barcodeModalLocationIdSpan.textContent = locationId;
+                barcodeModalImage.src = largeBarcodeSrc;
+                const modal = new bootstrap.Modal(barcodeModal);
+                modal.show();
+            }
+        }
+    });
+
+    // Funkcja do drukowania kodu kreskowego (wywoływana z modala)
+    tnApp.printBarcodeModal = function() {
+        // TODO: Zaimplementuj logikę drukowania kodu kreskowego z modala.
+        //  Możesz otworzyć nowe okno z samym obrazkiem kodu kreskowego i wywołać window.print().
+        const imageUrl = barcodeModalImage.src;
+        if (imageUrl) {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write('<html><head><title>Drukuj Kod Kreskowy</title></head><body>');
+            printWindow.document.write('<img src="' + imageUrl + '" onload="window.print(); window.close();" />');
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+        } else {
+            alert('Błąd: Brak obrazu kodu kreskowego do wydruku.');
+        }
+    };
+
+
+    // --- Obsługa Popoverów Szybkiego Podglądu Produktu ---
+    // Bootstrap Popover wymaga inicjalizacji
+    // Używamy event delegation, ponieważ sloty są dynamicznie filtrowane/renderowane
+    const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+    const popoverList = [...popoverTriggerList].map(popoverTriggerEl => {
+        // Pobierz zawartość z atrybutu data-popover-content
+        const contentData = JSON.parse(popoverTriggerEl.getAttribute('data-popover-content'));
+        return new bootstrap.Popover(popoverTriggerEl, {
+            container: 'body', // Ważne, aby popover był poza slotem, by uniknąć problemów z ukrywaniem
+            html: true, // Umożliwia wyświetlanie HTML w zawartości
+            title: contentData.title,
+            content: contentData.content,
+            trigger: 'hover', // Aktywuj na najechanie myszką
+            placement: 'auto', // Automatyczne pozycjonowanie
+            customClass: 'tn-warehouse-popover' // Dodatkowa klasa CSS dla stylizacji
+        });
+    });
+
+
+    // --- Funkcja do kopiowania do schowka (używana w onclick slotu) ---
+    tnApp.copyToClipboard = function(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            console.log('Skopiowano do schowka:', text);
+            // Opcjonalnie: wyświetlaj krótki komunikat "Skopiowano!"
+            tnApp.showToast('Skopiowano: ' + text, 'success');
+        }, function(err) {
+            console.error('Nie udało się skopiować do schowka:', err);
+            // Opcjonalnie: wyświetlaj komunikat o błędzie
+            tnApp.showToast('Nie udało się skopiować.', 'danger');
+        });
+    };
+
+
+    // --- Funkcja do wyświetlania komunikatów (Toast) ---
+    tnApp.showToast = function(message, type = 'info') {
+        const toastContainer = document.getElementById('toastContainer');
+        if (!toastContainer) {
+            console.error('Toast container not found!');
+            return;
+        }
+
+        const toastElement = document.createElement('div');
+        toastElement.classList.add('toast', 'align-items-center', 'border-0', 'fade', 'show');
+        toastElement.setAttribute('role', 'alert');
+        toastElement.setAttribute('aria-live', 'assertive');
+        toastElement.setAttribute('aria-atomic', 'true');
+
+        // Ustawienie klasy tła w zależności od typu komunikatu
+        let bgColorClass = 'text-bg-info'; // Domyślnie info
+        if (type === 'success') bgColorClass = 'text-bg-success';
+        else if (type === 'danger') bgColorClass = 'text-bg-danger';
+        else if (type === 'warning') bgColorClass = 'text-bg-warning';
+
+        toastElement.classList.add(bgColorClass);
+
+        toastElement.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+
+        toastContainer.appendChild(toastElement);
+
+        // Automatyczne usuwanie toasta po kilku sekundach
+        const bootstrapToast = new bootstrap.Toast(toastElement, {
+            delay: 5000 // Czas wyświetlania w ms
+        });
+        bootstrapToast.show();
+
+        // Usunięcie elementu toast z DOM po zniknięciu
+        toastElement.addEventListener('hidden.bs.toast', function () {
+            toastElement.remove();
+        });
+    };
+
+    // TODO: Dodaj obsługę dla przycisku "Drukuj etykietę produktu" w slocie (tn-action-print-label)
+    //  Ten przycisk powinien zbierać dane produktu z atrybutów data- slotu
+    //  i wysyłać je do skryptu PHP generującego etykietę (np. tn_action_generate_label.php)
+    //  lub otwierać modal z podglądem etykiety do wydruku.
+
+    // TODO: Dodaj obsługę dla linku "Opróżnij lokalizację" w slocie (tn-action-clear)
+    //  Ten link już ma potwierdzenie w HTML, ale akcja PHP tn_action_clear_warehouse_slot.php
+    //  musi być zaimplementowana na serwerze.
+
+}); // Koniec DOMContentLoaded

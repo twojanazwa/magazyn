@@ -1,0 +1,1318 @@
+[
+    {
+        "id": "AR01-S01-M01",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 70,
+        "quantity": 24
+    },
+    {
+        "id": "AR01-S01-M02",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 106,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S01-M03",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 107,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S01-M04",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 70,
+        "quantity": 25
+    },
+    {
+        "id": "AR01-S01-M05",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 71,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S01-M06",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 122,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S01-M07",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 11,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S01-M08",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 50,
+        "quantity": 2
+    },
+    {
+        "id": "AR01-S01-M09",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 100,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S01-M10",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 46,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S01-M11",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 33,
+        "quantity": 4
+    },
+    {
+        "id": "AR01-S01-M12",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 34,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S02-M01",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 51,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S02-M02",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 119,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S02-M03",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 101,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S02-M04",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 45,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S02-M05",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 39,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S02-M06",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 36,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S02-M07",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 64,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S02-M08",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 73,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S02-M09",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 55,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S02-M10",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 79,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S02-M11",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 80,
+        "quantity": 2
+    },
+    {
+        "id": "AR01-S02-M12",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 38,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S03-M01",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 110,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S03-M02",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 44,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S03-M03",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 35,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S03-M04",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 60,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S03-M05",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 103,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S03-M06",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 43,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S03-M07",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 62,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S03-M08",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 59,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S03-M09",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 168,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S03-M10",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 40,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S03-M11",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 169,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S03-M12",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 85,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S04-M01",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 170,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S04-M02",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 112,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S04-M03",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 77,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S04-M04",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 57,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S04-M05",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 65,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S04-M06",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 74,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S04-M07",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 63,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S04-M08",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 104,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S04-M09",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 49,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S04-M10",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 67,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S04-M11",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 81,
+        "quantity": 2
+    },
+    {
+        "id": "AR01-S04-M12",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 53,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S05-M01",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 41,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S05-M02",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 106,
+        "quantity": 2
+    },
+    {
+        "id": "AR01-S05-M03",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 52,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S05-M04",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 42,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S05-M05",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 48,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S05-M06",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 69,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S05-M07",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 75,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S05-M08",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 118,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S05-M09",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 16,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S05-M10",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 102,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S05-M11",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 120,
+        "quantity": 1
+    },
+    {
+        "id": "AR01-S05-M12",
+        "tn_id_regalu": "AR01",
+        "status": "occupied",
+        "product_id": 76,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P01-M01",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 121,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P01-M02",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 78,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P01-M03",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 47,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P01-M04",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 56,
+        "quantity": 2
+    },
+    {
+        "id": "AR02-P01-M05",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 72,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P01-M06",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 117,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P01-M07",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 58,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P01-M08",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 66,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P01-M09",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 105,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P01-M10",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 68,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P01-M11",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 31,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P01-M12",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 31,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P02-M01",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 123,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P02-M02",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 124,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P02-M03",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 125,
+        "quantity": 9
+    },
+    {
+        "id": "AR02-P02-M04",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 126,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P02-M05",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 127,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P02-M06",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 128,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P02-M07",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 129,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P02-M08",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 130,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P02-M09",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 131,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P02-M10",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 132,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P02-M11",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 113,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P02-M12",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 116,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P03-M01",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 133,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P03-M02",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 134,
+        "quantity": 2
+    },
+    {
+        "id": "AR02-P03-M03",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 135,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P03-M04",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 120,
+        "quantity": 2
+    },
+    {
+        "id": "AR02-P03-M05",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 120,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P03-M06",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 50,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P03-M07",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 33,
+        "quantity": 4
+    },
+    {
+        "id": "AR02-P03-M08",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 36,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P03-M09",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 61,
+        "quantity": 2
+    },
+    {
+        "id": "AR02-P03-M10",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 136,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P03-M11",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 137,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P03-M12",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 138,
+        "quantity": 2
+    },
+    {
+        "id": "AR02-P04-M01",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 139,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P04-M02",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 140,
+        "quantity": 10
+    },
+    {
+        "id": "AR02-P04-M03",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 143,
+        "quantity": 10
+    },
+    {
+        "id": "AR02-P04-M04",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 144,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P04-M05",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 145,
+        "quantity": 4
+    },
+    {
+        "id": "AR02-P04-M06",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 146,
+        "quantity": 2
+    },
+    {
+        "id": "AR02-P04-M07",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 147,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P04-M08",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 148,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P04-M09",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 149,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P04-M10",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 150,
+        "quantity": 1
+    },
+    {
+        "id": "AR02-P04-M11",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 151,
+        "quantity": false
+    },
+    {
+        "id": "AR02-P04-M12",
+        "tn_id_regalu": "AR02",
+        "status": "occupied",
+        "product_id": 152,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S01-P01",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 153,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S01-P02",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 154,
+        "quantity": 4
+    },
+    {
+        "id": "AR03-S01-P03",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 155,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S01-P04",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 156,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S01-P05",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 157,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S01-P06",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 158,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S01-P07",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 159,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S01-P08",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 160,
+        "quantity": 10
+    },
+    {
+        "id": "AR03-S01-P09",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 161,
+        "quantity": 3
+    },
+    {
+        "id": "AR03-S01-P10",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 162,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S01-P11",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 163,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S01-P12",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 164,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S01-P13",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 165,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S01-P14",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 166,
+        "quantity": 4
+    },
+    {
+        "id": "AR03-S01-P15",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 172,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S01-P16",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 173,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S01-P17",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 171,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S01-P18",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 70,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S01-P19",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 174,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S01-P20",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 175,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S02-P01",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 176,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S02-P02",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 177,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S02-P03",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 178,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S02-P04",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 179,
+        "quantity": 4
+    },
+    {
+        "id": "AR03-S02-P05",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 180,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S02-P06",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 181,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S02-P07",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 182,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S02-P08",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 183,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S02-P09",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 184,
+        "quantity": 4
+    },
+    {
+        "id": "AR03-S02-P10",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 185,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S02-P11",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 186,
+        "quantity": 3
+    },
+    {
+        "id": "AR03-S02-P12",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 187,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S02-P13",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 188,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S02-P14",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 189,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S02-P15",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 190,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S02-P16",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 191,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S02-P17",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 192,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S02-P18",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 193,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S02-P19",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 194,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S02-P20",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 196,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S03-P01",
+        "tn_id_regalu": "AR03",
+        "status": "occupied",
+        "product_id": 195,
+        "quantity": 1
+    },
+    {
+        "id": "AR03-S03-P02",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P03",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P04",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P05",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P06",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P07",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P08",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P09",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P10",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P11",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P12",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P13",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P14",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P15",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P16",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P17",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P18",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P19",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S03-P20",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P01",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P02",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P03",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P04",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P05",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P06",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P07",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P08",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P09",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P10",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P11",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P12",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P13",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P14",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P15",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P16",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P17",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P18",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P19",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    },
+    {
+        "id": "AR03-S04-P20",
+        "tn_id_regalu": "AR03",
+        "status": "empty",
+        "product_id": null,
+        "quantity": 0
+    }
+]

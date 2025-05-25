@@ -1,0 +1,46 @@
+# ##############################################
+# ## 	              	tnApp   	      ##
+# ##############################################
+
+RewriteEngine On
+RewriteBase /
+#Options -Indexes
+
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+#<FilesMatch "\.(json|log|md|bak|dist|lock|sql|env)$">
+#    Require all denied
+#</FilesMatch>
+<Files .htaccess>
+   Require all denied
+</Files>
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} (.+)/$
+RewriteRule ^ %1 [R=301,L]
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+RewriteRule ^ index.php [QSA,L]
+RewriteRule ^api\.php/(.*)$ api.php [L,QSA]
+
+
+#produkty?sort=stock_desc produkty?sortuj=ilosc&od=najmniejszej
+#produkty?sort=stock_asc produkty?sortuj=ilosc&od=najwiekszej
+#produkty?sort=stock_desc&search=s produkty?sortuj=ilosc&od=najwiekszej&szukaj=
+
+#<IfModule mod_headers.c>
+#   Header set X-Content-Type-Options "nosniff"
+#   Header set X-Frame-Options "SAMEORIGIN"
+#   Header set Referrer-Policy "strict-origin-when-cross-origin"
+#	style-src 'self' https://twoja-nazwa.pl; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 	https://cdn.jsdelivr.net 'unsafe-inline';"
+# </IfModule>
+
+#RewriteRule ^(config|src|TNbazaDanych|templates|TNuploads)($|/) - [F,L,NC]
+ErrorDocument 403 /templates/error-pages/tn-403.html
+ErrorDocument 404 /templates/error-pages/tn-404.html
+ErrorDocument 500 /templates/error-pages/tn-500.html
+
+#Options +FollowSymLinks

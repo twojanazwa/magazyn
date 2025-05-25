@@ -1,0 +1,37 @@
+[
+  {
+    "id": "dpd_polska",
+    "name": "DPD Polska",
+    "is_active": false,
+    "tracking_url_pattern": "https://tracktrace.dpd.com.pl/parcelDetails?p1={tracking_number}",
+    "notes": "Standardowy kurier DPD."
+  },
+  {
+    "id": "inpost_paczkomaty",
+    "name": "InPost Paczkomaty",
+    "is_active": true,
+    "tracking_url_pattern": "https://inpost.pl/sledzenie-przesylek?number={tracking_number}",
+    "notes": "Dostawa do Paczkomatów InPost."
+  },
+  {
+    "id": "inpost_kurier",
+    "name": "InPost Kurier",
+    "is_active": false,
+    "tracking_url_pattern": "https://inpost.pl/sledzenie-przesylek?number={tracking_number}",
+    "notes": "Standardowa usługa kurierska InPost."
+  },
+  {
+    "id": "dhl_polska",
+    "name": "DHL Polska",
+    "is_active": false,
+    "tracking_url_pattern": "https://sprawdz.dhl.com.pl/szukaj.aspx?m=0&sn={tracking_number}",
+    "notes": "Obecnie nieaktywny."
+  },
+  {
+    "id": "poczta_polska",
+    "name": "Poczta Polska",
+    "is_active": true,
+    "tracking_url_pattern": "https://emonitoring.poczta-polska.pl/?numer={tracking_number}",
+    "notes": "Paczki pocztowe, listy polecone."
+  }
+]

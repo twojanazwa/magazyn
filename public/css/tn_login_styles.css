@@ -1,0 +1,218 @@
+﻿/* ========================================== */
+/* @plik: public/css/tn_login_styles.css      */
+/* @autor: Paweł Plichta / tnApp              */
+/* @wersja: 1.5.0                             */
+/* @app: tnApp (TN iMAG)                      */
+/* ========================================== */
+
+/* --- Animacje --- */
+@keyframes tnGradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+/* Animacja dla powitania */
+@keyframes tnWelcomeFadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Style Podstawowe --- */
+html { height: 100%; }
+body.tn-login-page-body {
+    min-height: 100vh;   /* Zapewnia pełną wysokość */
+    margin: 0;
+   /* font-family: 'Poppins', sans-serif;*/
+    color: var(--bs-light);
+    background: linear-gradient(-55deg, #23272b, #3a0c7a, #23272b, #2c055a); /* Subtelnie zmieniony gradient */
+    background-size: 400% 400%;
+    animation: tnGradientBG 20s ease infinite;
+    overflow-x: hidden; /* Zapobiega poziomemu przewijaniu */
+    font-size: 0.9rem; /* Domyślna mniejsza czcionka dla całej strony logowania */
+}
+
+/* --- Układ Dwukolumnowy --- */
+.container-fluid { padding: 0; }
+.row.min-vh-100 { margin: 0; } /* Usuń marginesy wiersza */
+
+/* --- LEWA KOLUMNA: FORMULARZ --- */
+.tn-login-form-col {
+    background-color: rgba(var(--bs-dark-rgb), 0.8); /* Tło dla kolumny formularza */
+    padding: 2rem 1.5rem; /* Wewnętrzny padding */
+    display: flex;
+    flex-direction: column; /* Elementy jeden pod drugim */
+    justify-content: center; /* Wyśrodkowanie w pionie */
+}
+
+.tn-login-form-wrapper {
+    width: 100%;
+    max-width: 400px; /* Ograniczenie szerokości formularza */
+    margin: auto; /* Wyśrodkowanie wrappera w kolumnie */
+}
+
+/* Nagłówek formularza */
+.tn-login-header { text-align: center; margin-bottom: 1rem; }
+.tn-login-logo { max-width: 315.3px; height: auto; opacity: 0.3; filter: contrast(1.8%); margin-bottom: 0.5rem;}
+.tn-login-header h2 { font-weight: 600; font-size: 1.4rem; margin-top: 0.5rem; margin-bottom: 0.15rem; color: var(--bs-light); }
+.tn-login-header p { color: var(--bs-secondary-color); font-size: 0.85rem; }
+
+/* Formularz - dostosowanie rozmiarów */
+.form-floating { position: relative; }
+.form-floating > .form-control-sm {
+    min-height: calc(2.8rem + 2px); /* Dostosowanie wysokości dla form-control-sm */
+    height: calc(2.8rem + 2px);
+    line-height: 1.25;
+    padding: 0.8rem 0.75rem; /* Mniejszy padding dla sm */
+    font-size: 0.875rem; /* Czcionka w inputach */
+    background-color: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--bs-light);
+    border-radius: 0.3rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+.form-floating > label {
+    padding: 0.8rem 0.75rem; /* Dopasowanie paddingu etykiety */
+    font-size: 0.85rem; /* Mniejsza czcionka etykiety */
+    color: var(--bs-secondary-color);
+}
+/* Pozycjonowanie etykiety dla .form-control-sm */
+.form-floating > .form-control-sm:not(:placeholder-shown) ~ label {
+    transform: scale(0.85) translateY(-0.6rem) translateX(0.15rem);
+}
+.form-floating > .form-control-sm:focus ~ label,
+.form-floating > .form-control-sm:-webkit-autofill ~ label {
+    transform: scale(0.85) translateY(-0.6rem) translateX(0.15rem);
+}
+.form-floating > .form-control-sm:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.15rem rgba(var(--bs-primary-rgb), 0.3);
+    color: var(--bs-light);
+}
+.form-floating > .form-control-sm:focus ~ label { color: var(--bs-primary); }
+
+/* Przycisk Pokaż/Ukryj Hasło dla .form-control-sm */
+.tn-password-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: calc(2.8rem + 2px); /* Dopasowanie wysokości */
+    width: 2.5rem; /* Szerokość przycisku */
+    padding: 0 0.75rem; /* Padding wewnętrzny */
+    background: none; border: none;
+    color: var(--bs-secondary-color); cursor: pointer; z-index: 3;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.2s ease;
+}
+.tn-password-toggle:hover,
+.tn-password-toggle:focus { color: var(--bs-primary); outline: none; }
+.tn-password-toggle i { font-size: 1rem; vertical-align: middle; }
+.form-floating input[type="password"].form-control-sm,
+.form-floating input[type="text"]#tn_password.form-control-sm { padding-right: 2.8rem; }
+
+/* Przycisk Logowania - rozmiar sm */
+.btn-login.btn-sm {
+    padding: 0.5rem 1rem; /* Mniejszy padding */
+    font-size: 0.875rem; /* Mniejsza czcionka */
+    font-weight: 500;
+    /* Reszta stylów (kolory, hover) pozostaje podobna */
+    background: var(--bs-primary); border: none;
+    border-radius: 0.3rem; transition: all 0.2s ease;
+    box-shadow: 0 3px 10px rgba(var(--bs-primary-rgb), 0.2);
+    color: #fff;
+}
+.btn-login.btn-sm:hover {
+    background: linear-gradient(145deg, var(--bs-primary), var(--bs-primary-border-subtle));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(var(--bs-primary-rgb), 0.3);
+    color: #fff;
+}
+.btn-login.btn-sm:active { transform: translateY(0); box-shadow: 0 3px 10px rgba(var(--bs-primary-rgb), 0.2); }
+.btn-login.btn-sm:disabled { background: var(--bs-secondary); box-shadow: none; opacity: 0.7; }
+.btn-login.btn-sm .spinner-border { width: 0.9em; height: 0.9em; border-width: .18em; }
+
+/* Alerty - mniejsze marginesy */
+.tn-flash-container-login .alert {
+    border-radius: 0.3rem; font-size: 0.8rem; padding: 0.5rem 0.8rem; margin-bottom: 1rem;
+    background-color: rgba(var(--bs-danger-rgb), 0.2);
+    border: 1px solid rgba(var(--bs-danger-rgb), 0.4);
+    color: var(--bs-danger-text-emphasis);
+}
+.tn-flash-container-login .alert-warning {
+     background-color: rgba(var(--bs-warning-rgb), 0.2);
+     border: 1px solid rgba(var(--bs-warning-rgb), 0.4);
+     color: var(--bs-warning-text-emphasis);
+}
+.tn-flash-container-login .alert .btn-close { filter: none; opacity: 0.7; padding: 0.4rem; }
+.tn-flash-container-login .alert .btn-close:hover { opacity: 1; }
+.tn-flash-container-login .alert-danger .btn-close { color: var(--bs-danger-text-emphasis); }
+.tn-flash-container-login .alert-warning .btn-close { color: var(--bs-warning-text-emphasis); }
+
+/* Stopka formularza */
+.tn-login-footer { text-align: center; margin-top: 1.5rem; font-size: 0.75rem; color: var(--bs-secondary-color); }
+
+/* --- PRAWA KOLUMNA: POWITANIE --- */
+.tn-welcome-col {
+    /* Tło może być gradientem z body lub innym, np. delikatnie jaśniejszym */
+    background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.3)), radial-gradient(circle at top right, rgba(var(--bs-primary-rgb), 0.15), transparent 70%);
+    padding: 3rem;
+    text-align: center;
+    flex-direction: column; /* Ustawienie flex w JS nie jest potrzebne */
+}
+
+.tn-welcome-content {
+    max-width: 500px;
+    animation: tnWelcomeFadeInUp 0.8s ease-out 0.3s forwards; /* Aplikacja animacji */
+    opacity: 0; /* Początkowo ukryte dla animacji */
+}
+
+.tn-welcome-icon {
+    font-size: 4rem; /* Duża ikona */
+    color: var(--bs-primary);
+    margin-bottom: 1.5rem;
+    display: block;
+    text-shadow: 0 0 20px rgba(var(--bs-primary-rgb), 0.4);
+}
+
+.tn-welcome-title {
+    font-size: 1.2rem; /* Rozmiar tytułu powitania */
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--bs-light);
+}
+
+.tn-welcome-text {
+    font-size: 1rem; /* Standardowy rozmiar tekstu powitania */
+    color: var(--bs-secondary-color);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.tn-welcome-subtext {
+    font-size: 0.85rem;
+    color: rgba(var(--bs-light-rgb), 0.5);
+}
+
+
+/* --- Responsywność --- */
+@media (max-width: 767.98px) { /* Poniżej MD */
+    body.tn-login-page-body { font-size: 0.85rem; } /* Jeszcze mniejsza czcionka na mobile */
+
+    .tn-login-form-col {
+        padding: 1.5rem 1rem; /* Mniejszy padding na mobile */
+        background-color: transparent; /* Usuń tło kolumny, body ma gradient */
+        min-height: 100vh; /* Zajmuje całą wysokość */
+        align-items: center; /* Wyśrodkowanie w poziomie */
+    }
+    .tn-login-form-wrapper {
+         padding: 1.5rem; /* Dodaj padding do wrappera na mobile */
+         background-color: rgba(var(--bs-dark-rgb), 0.85); /* Tło dla wrappera */
+         border-radius: 0.5rem;
+         box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+
+    .tn-login-header h2 { font-size: 1.3rem; }
+    .tn-login-logo { max-width: 180px; }
+
+    /* Prawa kolumna jest ukryta przez d-none d-md-flex */
+}

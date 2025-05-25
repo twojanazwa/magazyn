@@ -1,0 +1,28 @@
+[
+    {
+        "id": 2,
+        "username": "admin",
+        "password_hash": "$2y$10$XIprs8sEF8Vw1z.DqhQ9p.wxwBW8jNOANV2VJ9pnd.tQxOKhsXeae",
+        "tn_imie_nazwisko": "Paweł Plichta",
+        "phone": "+48 537 983 124",
+        "avatar": "user_2_1745011260.png",
+        "email": "admin@tnapp.pl"
+    },
+{
+        "id": 3,
+        "username": "pplichta",
+        "password_hash": "$2y$10$XIprs8sEF8Vw1z.DqhQ9p.wxwBW8jNOANV2VJ9pnd.tQxOKhsXeae",
+        "tn_imie_nazwisko": "Paweł Plichta",
+        "phone": "+48 537 983 124",
+        "avatar": "user_2_1745011260.png",
+        "email": "p.plichta@tnapp.pl"
+    },
+    {
+        "id": 1,
+        "username": "drake",
+        "password_hash": "$2y$10$XIprs8sEF8Vw1z.DqhQ9p.wxwBW8jNOANV2VJ9pnd.tQxOKhsXeae",
+        "tn_imie_nazwisko": "Paweł Plichta",
+        "email": "p.plichta@tnapp.pl",
+        "avatar": "user_1_1747644480.png"
+    }
+]

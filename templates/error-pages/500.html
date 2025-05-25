@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Błąd 500 - Wewnętrzny Błąd Serwera</title>
+    <style>
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #444;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .tn-error-container {
+            max-width: 550px;
+            background-color: #ffffff;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+            border-top: 5px solid #6f42c1; /* Fioletowy akcent dla 500 */
+        }
+        .tn-error-icon {
+            width: 80px; /* Zwiększony rozmiar ikony */
+            height: 80px;
+            fill: #6f42c1; /* Kolor ikony */
+            margin-bottom: 25px;
+        }
+        .tn-error-code {
+            font-size: 5rem;
+            font-weight: 600;
+            color: #6f42c1;
+            margin: 0;
+            line-height: 1;
+        }
+        .tn-error-title {
+            font-size: 1.75rem;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 500;
+        }
+        .tn-error-message {
+            color: #6c757d;
+            margin-bottom: 30px;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .tn-error-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #5856d6;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 5px rgba(88, 86, 214, 0.3);
+        }
+        .tn-error-button:hover {
+            background-color: #4c4ac2;
+            box-shadow: 0 4px 10px rgba(88, 86, 214, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="tn-error-container">
+        <svg class="tn-error-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+            <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+            <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.159c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.27.92.01 1.938-.527 2.64l-.318.442a.873.873 0 0 1-1.196.26l-.49-.293c-.818-.488-1.778.153-1.778 1.157l-.003.517a.873.873 0 0 1-.616.816l-.503.171c-1.16.39-1.16 1.946 0 2.336l.503.171a.873.873 0 0 1 .616.816l.003.517c0 1.003.96 1.645 1.778 1.157l.49-.293a.873.873 0 0 1 1.196.26l.318.442c.537.702.797 1.72.527 2.64l-.07.238c-.412 1.398 1.62 2.54 2.975 1.73l.25-.149a.873.873 0 0 1 .985 0l.25.149c1.355.81 3.387-.332 2.975-1.73l-.07-.238c-.27-.92-.01-1.938.528-2.64l.318-.442a.873.873 0 0 1 1.196-.26l.49.293c.818.488 1.778-.153 1.778-1.157l.003-.517a.873.873 0 0 1 .616-.816l.503-.171c1.16-.39 1.16-1.946 0-2.336l-.503-.171a.873.873 0 0 1-.616-.816l-.003-.517c0-1.003-.96-1.645-1.778-1.157l-.49.293a.873.873 0 0 1-1.196-.26l-.318-.442c-.537-.702-.797-1.72-.528-2.64l.07-.238c.412-1.398-1.62-2.54-2.975-1.73l-.25.149a.873.873 0 0 1-.985 0l-.25-.149c-1.355-.81-3.387.332-2.975 1.73l.07.238z"/>
+        </svg>
+        <h1 class="tn-error-code">500</h1>
+        <h2 class="tn-error-title">Wewnętrzny Błąd Serwera</h2>
+        <p class="tn-error-message">Coś poszło nie tak po naszej stronie. Pracujemy nad rozwiązaniem problemu. </p>
+        <img src="/TNimg/logo_error.png" width="15%">
+    </div>
+</body>
+</html>

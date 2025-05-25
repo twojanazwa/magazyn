@@ -1,0 +1,8 @@
+Options -Indexes
+<FilesMatch "\.(php([3-7]|s)?|phtml|phar|pl|py|cgi|asp|aspx|sh|bash)">
+ Order allow,deny
+ Deny from all
+</FilesMatch>
+# Deny all access
+Order Allow,Deny
+Deny from all

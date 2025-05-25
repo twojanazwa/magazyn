@@ -1,0 +1,36 @@
+/* Plik: css/tn_warehouse_view.css */
+
+/* --- Ogólne Style Siatki --- */
+.tn-level-slots {}
+.tn-location-slot { border: 1px solid var(--bs-border-color-translucent); border-radius: var(--bs-border-radius-sm); background-color: var(--bs-body-bg); box-shadow: var(--bs-box-shadow-sm); position: relative; display: flex; flex-direction: column; transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-color 0.15s ease-in-out, opacity 0.3s ease; cursor: default; }
+.tn-location-slot:hover { box-shadow: var(--bs-box-shadow-lg); border-color: var(--bs-primary-border-subtle); }
+.tn-location-slot.status-occupied { border-left: 4px solid var(--bs-primary); }
+.tn-location-slot.status-empty { border-left: 4px solid var(--bs-secondary); cursor: pointer; }
+.tn-location-slot.status-error { border-left: 4px solid var(--bs-danger); background-color: var(--bs-danger-bg-subtle); }
+.tn-slot-header { padding: 0.3rem 0.5rem; background-color: var(--bs-tertiary-bg); border-bottom: 1px solid var(--bs-border-color-translucent); flex-shrink: 0; }
+.tn-slot-id { font-weight: 500; color: var(--bs-secondary-color); cursor: pointer; font-family: 'Courier New', Courier, monospace; }
+.tn-slot-id:hover { color: var(--bs-primary); }
+.tn-slot-content { padding: 0.5rem; min-height: 50px; display: flex; align-items: center; justify-content: center; flex-grow: 1; overflow: hidden; }
+.tn-slot-product { text-align: left; width: 100%; }
+.tn-slot-thumbnail-small { object-fit: cover; border-radius: var(--bs-border-radius-sm); vertical-align: middle; border: 1px solid var(--bs-border-color-translucent); flex-shrink: 0; background-color: #fff; }
+.tn-slot-thumbnail-placeholder { display: inline-flex; align-items: center; justify-content: center; background-color: var(--bs-secondary-bg-subtle); color: var(--bs-secondary-color); }
+.tn-img-placeholder { opacity: 0.6; filter: grayscale(80%); }
+.tn-slot-product-details { display: inline-block; vertical-align: middle; overflow: hidden; }
+.tn-slot-product-details .tn-product-link { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--bs-body-color); font-weight: 500; }
+.tn-slot-product-details .tn-product-link:hover { color: var(--bs-primary); }
+.tn-slot-empty-text { color: var(--bs-secondary-color); font-style: italic; text-align: center; width: 100%; }
+.tn-slot-actions { position: absolute; display: flex; opacity: 0; transition: opacity 0.2s ease-in-out; z-index: 5; background-color: rgba(var(--bs-body-bg-rgb), 0.7); padding: 2px; border-radius: var(--bs-border-radius-sm); pointer-events: none; }
+.tn-location-slot:hover .tn-slot-actions { opacity: 1; pointer-events: auto; }
+.tn-slot-action-btn { line-height: 1; border-color: rgba(var(--bs-body-color-rgb), 0.2); }
+.tn-slot-action-btn:hover { border-color: currentColor; }
+.tn-location-slot.status-empty .tn-slot-actions .tn-action-print-label, .tn-location-slot.status-error .tn-slot-actions .tn-action-print-label, .tn-location-slot.status-empty .tn-slot-actions .tn-action-clear, .tn-location-slot.status-error .tn-slot-actions .tn-action-clear, .tn-location-slot.status-empty .tn-slot-actions .tn-action-quick-view, .tn-location-slot.status-error .tn-slot-actions .tn-action-quick-view { display: none; }
+.tn-slot-barcode { margin-top: auto; padding: 0.3rem 0.5rem; background-color: var(--bs-tertiary-bg); border-top: 1px solid var(--bs-border-color-translucent); flex-shrink: 0; }
+.tn-barcode-image { display: block; margin: 0 auto; max-width: 90%; object-fit: contain; background-color: #fff; padding: 1px; }
+.tn-slot-related-highlight { box-shadow: 0 0 0 3px var(--bs-info-border-subtle); border-left-color: var(--bs-info) !important; z-index: 2 !important; }
+.tn-warehouse-popover { max-width: 250px; }
+.tn-warehouse-filters { background-color: rgba(var(--bs-body-bg-rgb), 0.95); backdrop-filter: blur(5px); }
+.tn-regal-card { transition: opacity 0.3s ease, display 0s linear 0.3s; }
+.tn-level-block { border-bottom: 1px solid var(--bs-border-color-translucent); background-color: var(--bs-body-bg); }
+.tn-level-block:last-child { border-bottom: none; }
+.tn-level-header { background-color: var(--bs-secondary-bg-subtle); font-size: 0.85em; padding: 0.2rem 0.75rem; border-bottom: 1px solid var(--bs-border-color-translucent); }
+.tn-btn-action { line-height: 1; }
